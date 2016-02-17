@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Cookly Cook</string>
+    <string name="open_drawer">Open Menu</string>
+    <string name="close_drawer">Close Menu</string>
+
+    <string name="signed_in_fmt">Signed in as: %s</string>
+    <string name="email">Email: %s</string>
+    <string name="gender">Gender: %s</string>
+    <string name="log_out">\u00A0\u00A0Log out</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="signed_out">Signed out</string>
+    <string name="loading">Loading...</string>
+
+    <string name="facebook_app_id">161289754252206</string>
+
+    <string name="sign_in_with_facebook">\u00A0\u00A0Sign In with Facebook</string>
+    <string name="sign_in_with_google">\u00A0\u00A0Sign In with Google</string>
+    <string name="sign_in_as_guest"><u>Sign In as Guest</u></string>
+</resources>

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_id": "cooklycook",
+    "project_number": "750551530599",
+    "name": "CooklyCook"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:750551530599:android:635aa174ddf8a7ed",
+        "client_id": "android:com.natavit.cooklycook",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "com.natavit.cooklycook"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "750551530599-9d5e39mpkepteapfnbem1duokvrlsmqq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.natavit.cooklycook",
+            "certificate_hash": "4545282E7E00A1D0E3E56281CBC3B45E464E4B66"
+          }
+        },
+        {
+          "client_id": "750551530599-1al8ofths584a6maeokggvkrrprc4bia.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 1,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 2
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}
