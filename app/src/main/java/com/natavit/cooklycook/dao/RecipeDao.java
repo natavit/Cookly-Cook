@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  *
- * Edamam FoodEdamam API
+ * Edamam API
  *
  */
 public class RecipeDao implements Parcelable {

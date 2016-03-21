@@ -13,10 +13,10 @@
 
     <string name="facebook_app_id">161289754252206</string>
 
-    <string name="sign_in_with_facebook">\u00A0\u00A0Sign In with Facebook</string>
-    <string name="sign_in_with_google">\u00A0\u00A0Sign In with Google</string>
-    <string name="sign_in_as_guest"><u>Sign In as Guest</u></string>
-    
+    <string name="sign_in_with_facebook">\u00A0\u00A0Sign in with Facebook</string>
+    <string name="sign_in_with_google">\u00A0\u00A0Sign in with Google</string>
+    <string name="sign_in_as_guest"><u>Sign in as Guest</u></string>
+
     <string name="edamam_app_id">f3c9f4db</string>
     <string name="edamam_app_key">a64b3bb38b5e6ec2cc8e172a6e10b32f</string>
 </resources>

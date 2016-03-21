@@ -8,6 +8,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.facebook.AccessToken;
@@ -25,6 +28,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.natavit.cooklycook.R;
+import com.natavit.cooklycook.activity.AnimationActivity;
 import com.natavit.cooklycook.activity.MainActivity;
 import com.natavit.cooklycook.util.Utils;
 
@@ -38,6 +42,43 @@ import mehdi.sakout.fancybuttons.FancyButton;
  */
 public class LoginFragment extends Fragment implements View.OnClickListener {
 
+    /**
+     *
+     * Interface
+     *
+     */
+
+    private FacebookCallback fbCallback =
+            new FacebookCallback<LoginResult>() {
+                @Override
+                public void onSuccess(LoginResult loginResult) {
+                    // App code
+                    updateFacebookToken(loginResult.getAccessToken());
+                }
+
+                @Override
+                public void onCancel() {
+                    // App code
+                    Utils.getInstance().showSnackBarShort("Login Cancel", coordinatorLayout);
+                }
+
+                @Override
+                public void onError(FacebookException exception) {
+                    // App code
+                    if (Utils.getInstance().isOnline())
+                        Utils.getInstance().showSnackBarShort("Login Error", coordinatorLayout);
+                    else
+                        Utils.getInstance().showSnackBarShort("No Internet Connection", coordinatorLayout);
+                }
+            };
+
+
+    /**
+     *
+     * Variable
+     *
+     */
+
     private static final String TAG = LoginFragment.class.getName();
 
     // Facebook variable
@@ -50,9 +91,17 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     // View
     private CoordinatorLayout coordinatorLayout;
+    private LinearLayout linearLayoutLoginBtn;
+
     private FancyButton btnLoginFacebook;
     private FancyButton btnLoginGoogle;
     private TextView btnLoginGuest;
+
+    /**
+     *
+     * Function
+     *
+     */
 
     public LoginFragment() {
         super();
@@ -84,9 +133,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     private void initInstances(View rootView) {
         coordinatorLayout = (CoordinatorLayout) rootView.findViewById(R.id.coordinatorLayout);
+
+        linearLayoutLoginBtn = (LinearLayout) rootView.findViewById(R.id.linearLayoutLoginBtn);
+        Animation anim = AnimationUtils.loadAnimation(getActivity(), R.anim.up_from_bottom);
+        linearLayoutLoginBtn.startAnimation(anim);
     }
 
-    // Init Facebook //
+    // Init Facebook
     // Login type = 1
     private void initFacebookInstances(View rootView) {
         // init instance with rootView.findViewById here
@@ -94,29 +147,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
         callbackManager = CallbackManager.Factory.create();
 
-        LoginManager.getInstance().registerCallback(callbackManager,
-                new FacebookCallback<LoginResult>() {
-                    @Override
-                    public void onSuccess(LoginResult loginResult) {
-                        // App code
-                        updateFacebookToken(loginResult.getAccessToken());
-                    }
-
-                    @Override
-                    public void onCancel() {
-                        // App code
-                        Utils.getInstance().showSnackBarShort("Login Cancel", coordinatorLayout);
-                    }
-
-                    @Override
-                    public void onError(FacebookException exception) {
-                        // App code
-                        if (Utils.getInstance().isOnline())
-                            Utils.getInstance().showSnackBarShort("Login Error", coordinatorLayout);
-                        else
-                            Utils.getInstance().showSnackBarShort("No Internet Connection", coordinatorLayout);
-                    }
-                });
+        LoginManager.getInstance().
+                registerCallback(callbackManager, fbCallback);
 
         btnLoginFacebook = (FancyButton) rootView.findViewById(R.id.btnLoginFacebook);
         btnLoginFacebook.setOnClickListener(this);
@@ -191,10 +223,11 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     private void logInGuest() {
         // TODO: Login Guest, check login status by SharedPreference
-        Intent i = new Intent(getActivity(), MainActivity.class);
+//        Intent i = new Intent(getActivity(), MainActivity.class);
+        Intent i = new Intent(getActivity(), AnimationActivity.class);
         i.putExtra("loginType", R.integer.login_type_guest);
         startActivity(i);
-        getActivity().finish();
+//        getActivity().finish();
     }
 
     @Override
@@ -273,4 +306,5 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 break;
         }
     }
+
 }

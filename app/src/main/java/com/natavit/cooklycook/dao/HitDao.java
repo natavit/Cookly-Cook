@@ -12,7 +12,7 @@ import com.google.gson.annotations.SerializedName;
 
 /**
  *
- * Edamam FoodEdamam API
+ * Edamam API
  *
  */
 public class HitDao implements Parcelable {

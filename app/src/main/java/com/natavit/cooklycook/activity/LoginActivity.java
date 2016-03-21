@@ -6,6 +6,9 @@ import android.support.v4.app.FragmentActivity;
 import com.natavit.cooklycook.R;
 import com.natavit.cooklycook.fragment.LoginFragment;
 
+/**
+ * Created by Natavit on 2/4/2016 AD.
+ */
 public class LoginActivity extends FragmentActivity {
 
     @Override
@@ -13,7 +16,7 @@ public class LoginActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        initInstance();
+//        initInstance();
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()

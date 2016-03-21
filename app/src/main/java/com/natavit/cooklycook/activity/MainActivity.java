@@ -11,10 +11,13 @@ import android.view.MenuItem;
 
 import com.facebook.appevents.AppEventsLogger;
 import com.natavit.cooklycook.R;
+import com.natavit.cooklycook.dao.HitDao;
 import com.natavit.cooklycook.fragment.MainFragment;
 
-
-public class MainActivity extends AppCompatActivity {
+/**
+ * Created by Natavit on 2/4/2016 AD.
+ */
+public class MainActivity extends AppCompatActivity implements MainFragment.FragmentListener {
 
     // View
     private DrawerLayout drawerLayout;
@@ -41,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
                         .commit();
             } else {
                 getSupportFragmentManager().beginTransaction()
-                        .add(R.id.contentContainer, MainFragment.newInstance(loginType), "MainFragment")
+                        .add(R.id.contentContainer, MainFragment.newInstance(null, loginType), "MainFragment")
                         .commit();
             }
         }
@@ -60,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
                 R.string.open_drawer,
                 R.string.close_drawer
         );
-        drawerLayout.setDrawerListener(actionBarDrawerToggle);
+        drawerLayout.addDrawerListener(actionBarDrawerToggle);
 
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -101,5 +104,11 @@ public class MainActivity extends AppCompatActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         actionBarDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public void onPhotoItemClicked(HitDao dao) {
+//        Intent intent = new Intent(MainActivity.this, MoreInfoActivity.class);
+//        startActivity(intent);
     }
 }

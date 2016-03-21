@@ -1,5 +1,8 @@
 package com.natavit.cooklycook.dao;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -9,11 +12,11 @@ import java.util.List;
 /**
  * Created by Natavit on 1/29/2016 AD.
  */
-public class FoodCollectionDao {
+public class FoodCollectionDao implements Parcelable{
 
     /**
      *
-     * Edamam FoodEdamam API
+     * Edamam API
      *
      */
 
@@ -22,19 +25,40 @@ public class FoodCollectionDao {
     private String q;
     @SerializedName("from")
     @Expose
-    private Integer from;
+    private int from;
     @SerializedName("to")
     @Expose
-    private Integer to;
+    private int to;
     @SerializedName("more")
     @Expose
     private Boolean more;
     @SerializedName("count")
     @Expose
-    private Integer count;
+    private int count;
     @SerializedName("hits")
     @Expose
     private List<HitDao> hits = new ArrayList<HitDao>();
+
+    public FoodCollectionDao() {
+
+    }
+
+    protected FoodCollectionDao(Parcel in) {
+        q = in.readString();
+        hits = in.createTypedArrayList(HitDao.CREATOR);
+    }
+
+    public static final Creator<FoodCollectionDao> CREATOR = new Creator<FoodCollectionDao>() {
+        @Override
+        public FoodCollectionDao createFromParcel(Parcel in) {
+            return new FoodCollectionDao(in);
+        }
+
+        @Override
+        public FoodCollectionDao[] newArray(int size) {
+            return new FoodCollectionDao[size];
+        }
+    };
 
     /**
      * @return The q
@@ -53,7 +77,7 @@ public class FoodCollectionDao {
     /**
      * @return The from
      */
-    public Integer getFrom() {
+    public int getFrom() {
         return from;
     }
 
@@ -67,7 +91,7 @@ public class FoodCollectionDao {
     /**
      * @return The to
      */
-    public Integer getTo() {
+    public int getTo() {
         return to;
     }
 
@@ -121,4 +145,14 @@ public class FoodCollectionDao {
     }
 
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(q);
+        dest.writeTypedList(hits);
+    }
 }

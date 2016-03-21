@@ -3,12 +3,17 @@ package com.natavit.cooklycook.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
@@ -24,18 +29,47 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.natavit.cooklycook.R;
 import com.natavit.cooklycook.activity.LoginActivity;
+import com.natavit.cooklycook.adapter.FoodListAdapter;
+import com.natavit.cooklycook.dao.FoodCollectionDao;
+import com.natavit.cooklycook.dao.HitDao;
+import com.natavit.cooklycook.datatype.MutableInteger;
+import com.natavit.cooklycook.manager.Contextor;
+import com.natavit.cooklycook.manager.FoodListManager;
+import com.natavit.cooklycook.manager.HttpManager;
 import com.natavit.cooklycook.util.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+
 import mehdi.sakout.fancybuttons.FancyButton;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 /**
  * Created by Natavit on 2/4/2016 AD.
  */
 public class MainFragment extends Fragment implements View.OnClickListener{
+
+
+    /**
+     *
+     * Interface
+     *
+     */
+
+    public interface FragmentListener {
+        void onPhotoItemClicked(HitDao dao);
+    }
+
+    /**
+     *
+     * Variable
+     *
+     */
 
     private static int loginType;
 
@@ -56,6 +90,20 @@ public class MainFragment extends Fragment implements View.OnClickListener{
 
     private CoordinatorLayout coordinatorLayout;
 
+    boolean isLoadingMore = false;
+
+    ListView listView;
+    FoodListAdapter listAdapter;
+
+    FoodListManager foodListManager;
+
+    MutableInteger lastPositionInteger;
+
+    /**
+     *
+     * Function
+     *
+     */
 
     public MainFragment() {
         super();
@@ -64,18 +112,24 @@ public class MainFragment extends Fragment implements View.OnClickListener{
     public static MainFragment newInstance(Parcelable acct, int loginType) {
         MainFragment fragment = new MainFragment();
         Bundle args = new Bundle();
-        args.putParcelable("acct", acct);
+        if (acct != null) args.putParcelable("acct", acct);
         args.putInt("loginType", loginType);
         fragment.setArguments(args);
         return fragment;
     }
 
-    public static MainFragment newInstance(int loginType) {
-        MainFragment fragment = new MainFragment();
-        Bundle args = new Bundle();
-        args.putInt("loginType", loginType);
-        fragment.setArguments(args);
-        return fragment;
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Initialize Fragment level's variables
+
+        init(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            onRestoreInstanceState(savedInstanceState);
+        }
+
     }
 
     @Override
@@ -83,34 +137,52 @@ public class MainFragment extends Fragment implements View.OnClickListener{
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        initInstances(rootView);
+        initInstances(rootView, savedInstanceState);
 
         if (!Utils.getInstance().isOnline())
             Utils.getInstance().showSnackBarLong("Offline Mode", coordinatorLayout);
 
         if (getLoginType() == R.integer.login_type_facebook)
-            initFacebookInstances(rootView);
+            initFacebookInstances(rootView, savedInstanceState);
         else if (getLoginType() == R.integer.login_type_google)
-            initGoogleInstances(rootView);
+            initGoogleInstances(rootView, savedInstanceState);
         else
-            initGuestInstances(rootView);
+            initGuestInstances(rootView, savedInstanceState);
 
         return rootView;
     }
 
-    private void initInstances(View rootView) {
+    private void init(Bundle savedInstanceState) {
+        // Initialize Fragment level's variable(s)
+        foodListManager = new FoodListManager();
+        lastPositionInteger = new MutableInteger(-1);
+
+//        SharedPreferences prefs = getContext().getSharedPreferences("dummy",
+//                Context.MODE_PRIVATE);
+    }
+
+    private void initInstances(View rootView, Bundle savedInstanceState) {
         // init instance with rootView.findViewById here
-        //setRetainInstance(true);
         loginType = getArguments().getInt("loginType");
 
         coordinatorLayout = (CoordinatorLayout) rootView.findViewById(R.id.coordinatorLayout);
         tvName = (TextView) rootView.findViewById(R.id.tvName);
         tvEmail = (TextView) rootView.findViewById(R.id.tvEmail);
         tvGender = (TextView) rootView.findViewById(R.id.tvGender);
+
+        listView = (ListView) rootView.findViewById(R.id.listView);
+        listAdapter = new FoodListAdapter(lastPositionInteger);
+        listAdapter.setDao(foodListManager.getDao());
+        listView.setAdapter(listAdapter);
+        listView.setOnItemClickListener(listViewItemClickListener);
+        listView.setOnScrollListener(listViewScrollListener);
+
+        if (savedInstanceState == null)
+            refreshData();
     }
 
     // Init Facebook //
-    private void initFacebookInstances(View rootView) {
+    private void initFacebookInstances(View rootView, Bundle savedInstanceState) {
         btnLogoutFacebook = (FancyButton) rootView.findViewById(R.id.btnLogoutFacebook);
 
         tvGender.setVisibility(View.VISIBLE);
@@ -153,13 +225,14 @@ public class MainFragment extends Fragment implements View.OnClickListener{
     }
 
     private void logOutFacebook() {
+        clearFoodCache();
         LoginManager.getInstance().logOut();
         startLoginActivity();
     }
     // End Facebook //
 
     // Init Google //
-    private void initGoogleInstances(View rootView) {
+    private void initGoogleInstances(View rootView, Bundle savedInstanceState) {
         acct = getArguments().getParcelable("acct");
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -184,6 +257,7 @@ public class MainFragment extends Fragment implements View.OnClickListener{
     }
 
     private void logOutGoogle() {
+        clearFoodCache();
         Auth.GoogleSignInApi.signOut(googleApiClient).setResultCallback(
                 new ResultCallback<Status>() {
                     @Override
@@ -197,7 +271,7 @@ public class MainFragment extends Fragment implements View.OnClickListener{
     // End Google //
 
     // Init Guest //
-    private void initGuestInstances(View rootView) {
+    private void initGuestInstances(View rootView, Bundle savedInstanceState) {
         btnLogoutGuest = (FancyButton) rootView.findViewById(R.id.btnLogoutGuest);
         btnLogoutGuest.setVisibility(View.VISIBLE);
         btnLogoutGuest.setOnClickListener(this);
@@ -207,11 +281,14 @@ public class MainFragment extends Fragment implements View.OnClickListener{
     }
 
     private void logOutGuest() {
+        clearFoodCache();
         startLoginActivity();
     }
-
     // End Guest //
 
+    private void clearFoodCache() {
+        foodListManager.clearCache();
+    }
 
     private int getLoginType() {
         if (loginType == R.integer.login_type_facebook)
@@ -229,6 +306,32 @@ public class MainFragment extends Fragment implements View.OnClickListener{
         getActivity().finish();
     }
 
+    private void refreshData() {
+        if (foodListManager.getCount() == 0) {
+            reloadData();
+        } else {
+        }
+    }
+
+    private void reloadData() {
+        Call<FoodCollectionDao> call = HttpManager.getInstance()
+                .getService()
+                .loadFoodList("Hamburger");
+        call.enqueue(new FoodListLoadCallback(FoodListLoadCallback.MODE_RELOAD));
+    }
+
+    private void loadMoreData() {
+        if (isLoadingMore) return;
+
+        isLoadingMore = true;
+
+        int nextPage = foodListManager.getNextPage();
+        Call<FoodCollectionDao> call = HttpManager.getInstance()
+                .getService()
+                .loadMoreFoodList("Hamburger", nextPage, nextPage+10);
+        call.enqueue(new FoodListLoadCallback(FoodListLoadCallback.MODE_LOAD_MORE));
+    }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -240,11 +343,27 @@ public class MainFragment extends Fragment implements View.OnClickListener{
     }
 
     /*
-     * Save Instance State Here
-     */
+    * Save Instance State Here
+    */
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+
+        outState.putBundle("foodListManager",
+                foodListManager.onSaveInstanceState());
+
+        outState.putBundle("lastPositionInteger",
+                lastPositionInteger.onSaveInstanceState());
+
+    }
+
+    private void onRestoreInstanceState(Bundle savedInstanceState) {
+        // Restore instance state here
+        foodListManager.onRestoreInstanceState(
+                savedInstanceState.getBundle("foodListManager"));
+
+        lastPositionInteger.onRestoreInstanceState(
+                savedInstanceState.getBundle("lastPositionInteger"));
     }
 
     /*
@@ -267,6 +386,119 @@ public class MainFragment extends Fragment implements View.OnClickListener{
             case R.id.btnLogoutGuest:
                 logOutGuest();
                 break;
+        }
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(Contextor.getInstance().getContext(),
+                message,
+                Toast.LENGTH_SHORT)
+                .show();
+    }
+
+    /**
+     *
+     * Listener
+     *
+     */
+
+    AbsListView.OnScrollListener listViewScrollListener = new AbsListView.OnScrollListener() {
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+        }
+
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+            if (view == listView) {
+                //swipeRefreshLayout.setEnabled(firstVisibleItem == 0);
+
+                // Load More
+                if (firstVisibleItem + visibleItemCount >= totalItemCount) {
+
+                    // Check if there are available data
+                    if (foodListManager.getCount() > 0) {
+                        loadMoreData();
+                    }
+                }
+            }
+        }
+    };
+
+    AdapterView.OnItemClickListener listViewItemClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            if (position < foodListManager.getCount()) {
+                HitDao dao = foodListManager.getDao().getHits().get(position);
+                FragmentListener listener = (FragmentListener) getActivity();
+                listener.onPhotoItemClicked(dao);
+            }
+        }
+    };
+
+
+    /**
+     *
+     * Inner Class
+     *
+     */
+
+    class FoodListLoadCallback implements Callback<FoodCollectionDao> {
+
+        public static final int MODE_RELOAD = 1;
+        public static final int MODE_LOAD_MORE = 2;
+
+        int mode;
+
+        public FoodListLoadCallback(int mode) {
+            this.mode = mode;
+        }
+
+        @Override
+        public void onResponse(Call<FoodCollectionDao> call, Response<FoodCollectionDao> response) {
+//            swipeRefreshLayout.setRefreshing(false);
+
+            if (response.isSuccess()) {
+                FoodCollectionDao dao = response.body();
+
+                int firstVisiblePosition = listView.getFirstVisiblePosition();
+                View c = listView.getChildAt(0);
+                int top = c == null ? 0 : c.getTop();
+
+                if (mode == MODE_LOAD_MORE) {
+                    foodListManager.appendDaoAtBottomPosition(dao);
+                }
+                else {
+                    foodListManager.setDao(dao);
+                }
+                clearLoadingMoreFlagIfCapable(mode);
+                listAdapter.setDao(foodListManager.getDao());
+                listAdapter.notifyDataSetChanged();
+
+                showToast("Load Completed");
+            } else {
+
+                clearLoadingMoreFlagIfCapable(mode);
+
+                try {
+                    showToast(response.errorBody().string());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        @Override
+        public void onFailure(Call<FoodCollectionDao> call, Throwable t) {
+
+            clearLoadingMoreFlagIfCapable(mode);
+
+            showToast(t.toString());
+        }
+
+        private void clearLoadingMoreFlagIfCapable(int mode) {
+            if (mode == MODE_LOAD_MORE)
+                isLoadingMore = false;
         }
     }
 }

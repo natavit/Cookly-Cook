@@ -6,57 +6,76 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <RelativeLayout
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:gravity="center"
+            android:layout_height="match_parent"
+            android:background="@color/colorPrimary"
             android:orientation="vertical"
-            android:padding="64dp">
+            android:weightSum="2">
 
-            <mehdi.sakout.fancybuttons.FancyButton
-                android:id="@+id/btnLoginFacebook"
+            <ImageView
+                android:padding="32dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:padding="8dp"
-                fancy:fb_defaultColor="#3b5998"
-                fancy:fb_focusColor="#5474b8"
-                fancy:fb_fontIconResource="&#xf082;"
-                fancy:fb_fontIconSize="30dp"
-                fancy:fb_iconPosition="left"
-                fancy:fb_text="@string/sign_in_with_facebook"
-                fancy:fb_textSize="17sp" />
+                android:layout_height="0dp"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:src="@drawable/logo" />
 
-            <mehdi.sakout.fancybuttons.FancyButton
-                android:id="@+id/btnLoginGoogle"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:padding="8dp"
-                fancy:fb_defaultColor="#CC1D1D"
-                fancy:fb_focusColor="#DD4B39"
-                fancy:fb_fontIconResource="&#xf1a0;"
-                fancy:fb_fontIconSize="30dp"
-                fancy:fb_iconPosition="left"
-                fancy:fb_text="@string/sign_in_with_google"
-                fancy:fb_textSize="17sp" />
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="64dp"
+                android:id="@+id/linearLayoutLoginBtn">
 
-            <TextView
-                android:id="@+id/btnLoginGuest"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/btn_guest_signin"
-                android:text="@string/sign_in_as_guest"
-                android:textSize="12sp" />
+                <mehdi.sakout.fancybuttons.FancyButton
+                    android:id="@+id/btnLoginFacebook"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:padding="8dp"
+                    fancy:fb_defaultColor="#3b5998"
+                    fancy:fb_focusColor="#5474b8"
+                    fancy:fb_fontIconResource="&#xf082;"
+                    fancy:fb_fontIconSize="30dp"
+                    fancy:fb_iconPosition="left"
+                    fancy:fb_text="@string/sign_in_with_facebook"
+                    fancy:fb_textSize="17sp" />
+
+                <mehdi.sakout.fancybuttons.FancyButton
+                    android:id="@+id/btnLoginGoogle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:padding="8dp"
+                    fancy:fb_defaultColor="#CC1D1D"
+                    fancy:fb_focusColor="#DD4B39"
+                    fancy:fb_fontIconResource="&#xf1a0;"
+                    fancy:fb_fontIconSize="30dp"
+                    fancy:fb_iconPosition="left"
+                    fancy:fb_text="@string/sign_in_with_google"
+                    fancy:fb_textSize="17sp" />
+
+                <TextView
+                    android:id="@+id/btnLoginGuest"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/btn_guest_signin"
+                    android:text="@string/sign_in_as_guest"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
-    </RelativeLayout>
+    </android.support.v4.widget.NestedScrollView>
 
 </android.support.design.widget.CoordinatorLayout>
