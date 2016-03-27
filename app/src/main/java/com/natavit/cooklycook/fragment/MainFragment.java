@@ -43,7 +43,7 @@ import retrofit2.Response;
 /**
  * Created by Natavit on 2/4/2016 AD.
  */
-public class MainFragment extends Fragment implements View.OnClickListener{
+public class MainFragment extends Fragment {
 
     /**
      *
@@ -371,8 +371,8 @@ public class MainFragment extends Fragment implements View.OnClickListener{
         super.onActivityCreated(savedInstanceState);
     }
 
-    @Override
-    public void onClick(View v) {
+//    @Override
+//    public void onClick(View v) {
 //        switch (v.getId()) {
 //            case R.id.btnLogoutFacebook:
 //                logOutFacebook();
@@ -384,7 +384,7 @@ public class MainFragment extends Fragment implements View.OnClickListener{
 //                logOutGuest();
 //                break;
 //        }
-    }
+//    }
 
     private void showToast(String message) {
         Toast.makeText(Contextor.getInstance().getContext(),
