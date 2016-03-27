@@ -1,6 +1,5 @@
 package com.natavit.cooklycook.fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
@@ -18,21 +17,14 @@ import android.widget.Toast;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
-import com.facebook.Profile;
-import com.facebook.login.LoginManager;
-import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
+import com.google.gson.Gson;
 import com.natavit.cooklycook.R;
-import com.natavit.cooklycook.activity.LoginActivity;
 import com.natavit.cooklycook.adapter.FoodListAdapter;
 import com.natavit.cooklycook.dao.FoodCollectionDao;
 import com.natavit.cooklycook.dao.HitDao;
 import com.natavit.cooklycook.datatype.MutableInteger;
+import com.natavit.cooklycook.manager.AccountManager;
 import com.natavit.cooklycook.manager.Contextor;
 import com.natavit.cooklycook.manager.FoodListManager;
 import com.natavit.cooklycook.manager.HttpManager;
@@ -43,7 +35,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
-import mehdi.sakout.fancybuttons.FancyButton;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -53,7 +44,6 @@ import retrofit2.Response;
  * Created by Natavit on 2/4/2016 AD.
  */
 public class MainFragment extends Fragment implements View.OnClickListener{
-
 
     /**
      *
@@ -73,22 +63,19 @@ public class MainFragment extends Fragment implements View.OnClickListener{
 
     private static int loginType;
 
-    // Facebook variable
-
-
     // Google variable
     private GoogleSignInAccount acct;
-    private GoogleApiClient googleApiClient;
 
     // View
-    private TextView tvName;
-    private TextView tvEmail;
-    private TextView tvGender;
-    private FancyButton btnLogoutFacebook;
-    private FancyButton btnLogoutGoogle;
-    private FancyButton btnLogoutGuest;
+    TextView tvName;
+    TextView tvEmail;
 
-    private CoordinatorLayout coordinatorLayout;
+//    TextView tvGender;
+//    FancyButton btnLogoutFacebook;
+//    FancyButton btnLogoutGoogle;
+//    FancyButton btnLogoutGuest;
+
+    CoordinatorLayout coordinatorLayout;
 
     boolean isLoadingMore = false;
 
@@ -98,6 +85,8 @@ public class MainFragment extends Fragment implements View.OnClickListener{
     FoodListManager foodListManager;
 
     MutableInteger lastPositionInteger;
+
+    AccountManager accountManager;
 
     /**
      *
@@ -142,12 +131,16 @@ public class MainFragment extends Fragment implements View.OnClickListener{
         if (!Utils.getInstance().isOnline())
             Utils.getInstance().showSnackBarLong("Offline Mode", coordinatorLayout);
 
-        if (getLoginType() == R.integer.login_type_facebook)
+        accountManager.setLoginType(getLoginType());
+        if (getLoginType() == R.integer.login_type_facebook) {
             initFacebookInstances(rootView, savedInstanceState);
-        else if (getLoginType() == R.integer.login_type_google)
+        }
+        else if (getLoginType() == R.integer.login_type_google) {
             initGoogleInstances(rootView, savedInstanceState);
-        else
-            initGuestInstances(rootView, savedInstanceState);
+        }
+        else {
+//            initGuestInstances(rootView, savedInstanceState);
+        }
 
         return rootView;
     }
@@ -156,7 +149,7 @@ public class MainFragment extends Fragment implements View.OnClickListener{
         // Initialize Fragment level's variable(s)
         foodListManager = new FoodListManager();
         lastPositionInteger = new MutableInteger(-1);
-
+        accountManager = AccountManager.getInstance();
 //        SharedPreferences prefs = getContext().getSharedPreferences("dummy",
 //                Context.MODE_PRIVATE);
     }
@@ -168,7 +161,7 @@ public class MainFragment extends Fragment implements View.OnClickListener{
         coordinatorLayout = (CoordinatorLayout) rootView.findViewById(R.id.coordinatorLayout);
         tvName = (TextView) rootView.findViewById(R.id.tvName);
         tvEmail = (TextView) rootView.findViewById(R.id.tvEmail);
-        tvGender = (TextView) rootView.findViewById(R.id.tvGender);
+//        tvGender = (TextView) rootView.findViewById(R.id.tvGender);
 
         listView = (ListView) rootView.findViewById(R.id.listView);
         listAdapter = new FoodListAdapter(lastPositionInteger);
@@ -181,16 +174,34 @@ public class MainFragment extends Fragment implements View.OnClickListener{
             refreshData();
     }
 
-    // Init Facebook //
+    /**
+     * Initialize Facebook Variables
+     * @param rootView
+     * @param savedInstanceState
+     */
     private void initFacebookInstances(View rootView, Bundle savedInstanceState) {
-        btnLogoutFacebook = (FancyButton) rootView.findViewById(R.id.btnLogoutFacebook);
+//        btnLogoutFacebook = (FancyButton) rootView.findViewById(R.id.btnLogoutFacebook);
+//
+////        tvGender.setVisibility(View.VISIBLE);
+//        btnLogoutFacebook.setVisibility(View.VISIBLE);
+//        btnLogoutFacebook.setOnClickListener(this);
 
-        tvGender.setVisibility(View.VISIBLE);
-        btnLogoutFacebook.setVisibility(View.VISIBLE);
-        btnLogoutFacebook.setOnClickListener(this);
+        String json = accountManager.loadCacheGraphRequest();
+        if (json == null) {
+            graphRequest();
+        }
+        else {
+            try {
+                JSONObject object = new Gson().fromJson(json, JSONObject.class);
+                tvName.setText(getString(R.string.signed_in_fmt, object.getString("name")));
+                tvEmail.setText(getString(R.string.email_in_fmt, object.getString("email")));
+//                tvGender.setText(getString(R.string.gender_in_fmt, object.getString("gender")));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
 
-//        graphRequest();
-        tvName.setText(getString(R.string.signed_in_fmt, Profile.getCurrentProfile().getName()));
+//        tvName.setText(getString(R.string.signed_in_fmt, Profile.getCurrentProfile().getName()));
 
     }
 
@@ -205,15 +216,18 @@ public class MainFragment extends Fragment implements View.OnClickListener{
                         // Application code
                         try {
                             tvName.setText(getString(R.string.signed_in_fmt, object.getString("name")));
-                            tvEmail.setText(getString(R.string.email, object.getString("email")));
-                            tvGender.setText(getString(R.string.gender, object.getString("gender")));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                            tvEmail.setText(getString(R.string.email_in_fmt, object.getString("email")));
+
+                            // Cache user's information
+                            accountManager.saveCacheGraphRequest(object);
+
                         } catch (NullPointerException e) {
                             if (Utils.getInstance().isOnline()) {
                                 Utils.getInstance().showToast("Session Expired");
-                                logOutFacebook();
+                                accountManager.logOutFacebook();
                             }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
                     }
                 });
@@ -224,71 +238,54 @@ public class MainFragment extends Fragment implements View.OnClickListener{
         request.executeAsync();
     }
 
-    private void logOutFacebook() {
-        clearFoodCache();
-        LoginManager.getInstance().logOut();
-        startLoginActivity();
-    }
     // End Facebook //
 
-    // Init Google //
+    /**
+     * Initialize Google Variables
+     * @param rootView
+     * @param savedInstanceState
+     */
     private void initGoogleInstances(View rootView, Bundle savedInstanceState) {
         acct = getArguments().getParcelable("acct");
 
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-
-        googleApiClient = new GoogleApiClient.Builder(getActivity())
-                .enableAutoManage(getActivity() /* FragmentActivity */, new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(ConnectionResult connectionResult) {
-
-                    }
-                })
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
+        accountManager.setupGoogleApiClient(getActivity());
 
         tvName.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
-        tvEmail.setText(getString(R.string.email, acct.getEmail()));
-        btnLogoutGoogle = (FancyButton) rootView.findViewById(R.id.btnLogoutGoogle);
-        btnLogoutGoogle.setVisibility(View.VISIBLE);
-        btnLogoutGoogle.setOnClickListener(this);
+        tvEmail.setText(getString(R.string.email_in_fmt, acct.getEmail()));
+//        btnLogoutGoogle = (FancyButton) rootView.findViewById(R.id.btnLogoutGoogle);
+//        btnLogoutGoogle.setVisibility(View.VISIBLE);
+//        btnLogoutGoogle.setOnClickListener(this);
     }
 
-    private void logOutGoogle() {
-        clearFoodCache();
-        Auth.GoogleSignInApi.signOut(googleApiClient).setResultCallback(
-                new ResultCallback<Status>() {
-                    @Override
-                    public void onResult(Status status) {
-                        if (status.isSuccess()) {
-                            startLoginActivity();
-                        }
-                    }
-                });
-    }
+
     // End Google //
 
-    // Init Guest //
-    private void initGuestInstances(View rootView, Bundle savedInstanceState) {
-        btnLogoutGuest = (FancyButton) rootView.findViewById(R.id.btnLogoutGuest);
-        btnLogoutGuest.setVisibility(View.VISIBLE);
-        btnLogoutGuest.setOnClickListener(this);
-
-        tvName.setText(getString(R.string.signed_in_fmt, "Guest"));
-        tvEmail.setVisibility(View.GONE);
-    }
-
-    private void logOutGuest() {
-        clearFoodCache();
-        startLoginActivity();
-    }
+//    /**
+//     * Initialize Guest Variables
+//     * @param rootView
+//     * @param savedInstanceState
+//     */
+//    private void initGuestInstances(View rootView, Bundle savedInstanceState) {
+//        btnLogoutGuest = (FancyButton) rootView.findViewById(R.id.btnLogoutGuest);
+//        btnLogoutGuest.setVisibility(View.VISIBLE);
+//        btnLogoutGuest.setOnClickListener(this);
+//
+//        tvName.setText(getString(R.string.signed_in_fmt, "Guest"));
+//        tvEmail.setVisibility(View.GONE);
+//    }
+//
+//    private void logOutGuest() {
+//        clearFoodCache();
+//        startLoginActivity();
+//    }
     // End Guest //
 
-    private void clearFoodCache() {
-        foodListManager.clearCache();
-    }
+
+    /**
+     *
+     * Main Functions
+     *
+     */
 
     private int getLoginType() {
         if (loginType == R.integer.login_type_facebook)
@@ -300,11 +297,11 @@ public class MainFragment extends Fragment implements View.OnClickListener{
         return R.integer.login_type_guest;
     }
 
-    private void startLoginActivity() {
-        Intent signInIntent = new Intent(getActivity(), LoginActivity.class);
-        startActivity(signInIntent);
-        getActivity().finish();
-    }
+//    private void startLoginActivity() {
+//        Intent signInIntent = new Intent(getActivity(), LoginActivity.class);
+//        startActivity(signInIntent);
+//        getActivity().finish();
+//    }
 
     private void refreshData() {
         if (foodListManager.getCount() == 0) {
@@ -376,17 +373,17 @@ public class MainFragment extends Fragment implements View.OnClickListener{
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btnLogoutFacebook:
-                logOutFacebook();
-                break;
-            case R.id.btnLogoutGoogle:
-                logOutGoogle();
-                break;
-            case R.id.btnLogoutGuest:
-                logOutGuest();
-                break;
-        }
+//        switch (v.getId()) {
+//            case R.id.btnLogoutFacebook:
+//                logOutFacebook();
+//                break;
+//            case R.id.btnLogoutGoogle:
+//                logOutGoogle();
+//                break;
+//            case R.id.btnLogoutGuest:
+//                logOutGuest();
+//                break;
+//        }
     }
 
     private void showToast(String message) {
@@ -475,7 +472,7 @@ public class MainFragment extends Fragment implements View.OnClickListener{
                 listAdapter.setDao(foodListManager.getDao());
                 listAdapter.notifyDataSetChanged();
 
-                showToast("Load Completed");
+//                showToast("Load Completed");
             } else {
 
                 clearLoadingMoreFlagIfCapable(mode);

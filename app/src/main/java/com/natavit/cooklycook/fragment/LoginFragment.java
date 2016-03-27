@@ -124,7 +124,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         if (!Utils.getInstance().isOnline())
             Utils.getInstance().showSnackBarLong("Offline Mode", coordinatorLayout);
 
-        initGuestInstances(rootView);
+//        initGuestInstances(rootView);
         initFacebookInstances(rootView);
         initGoogleInstances(rootView);
 
@@ -186,7 +186,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 .enableAutoManage(getActivity(), new GoogleApiClient.OnConnectionFailedListener() {
                     @Override
                     public void onConnectionFailed(ConnectionResult connectionResult) {
-
+                        Utils.getInstance().showSnackBarLong("Log in failed", coordinatorLayout);
                     }
                 })
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
@@ -211,15 +211,18 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             startActivity(i);
             getActivity().finish();
         }
+        else {
+            Utils.getInstance().showSnackBarLong("Log in failed", coordinatorLayout);
+        }
     }
     // End Google //
 
     // Init Guest //
     // Login type = 3
-    private void initGuestInstances(View rootView) {
-        btnLoginGuest = (TextView) rootView.findViewById(R.id.btnLoginGuest);
-        btnLoginGuest.setOnClickListener(this);
-    }
+//    private void initGuestInstances(View rootView) {
+//        btnLoginGuest = (TextView) rootView.findViewById(R.id.btnLoginGuest);
+//        btnLoginGuest.setOnClickListener(this);
+//    }
 
     private void logInGuest() {
         // TODO: Login Guest, check login status by SharedPreference
@@ -301,9 +304,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             case R.id.btnLoginGoogle:
                 logInGoogle();
                 break;
-            case R.id.btnLoginGuest:
-                logInGuest();
-                break;
+//            case R.id.btnLoginGuest:
+//                logInGuest();
+//                break;
         }
     }
 

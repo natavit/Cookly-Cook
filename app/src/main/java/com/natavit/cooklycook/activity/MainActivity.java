@@ -1,5 +1,6 @@
 package com.natavit.cooklycook.activity;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -8,29 +9,53 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 
 import com.facebook.appevents.AppEventsLogger;
 import com.natavit.cooklycook.R;
 import com.natavit.cooklycook.dao.HitDao;
 import com.natavit.cooklycook.fragment.MainFragment;
+import com.natavit.cooklycook.manager.AccountManager;
 
 /**
  * Created by Natavit on 2/4/2016 AD.
  */
-public class MainActivity extends AppCompatActivity implements MainFragment.FragmentListener {
+public class MainActivity extends AppCompatActivity implements MainFragment.FragmentListener, View.OnClickListener {
+
+    /**
+     *
+     * Interface
+     *
+     */
+
+    /**
+     *
+     * Variable
+     *
+     */
 
     // View
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle actionBarDrawerToggle;
     private Toolbar toolbar;
     private CoordinatorLayout coordinatorLayout;
+    private Button btnLogout;
+
+    AccountManager accountManager;
+
+    /**
+     *
+     * Function
+     *
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
-        initInstance();
+        initInstances();
 
         if (savedInstanceState == null) {
 
@@ -42,7 +67,8 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
                                 getIntent().getParcelableExtra("acct"), loginType),
                                 "MainFragment")
                         .commit();
-            } else {
+            }
+            else {
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.contentContainer, MainFragment.newInstance(null, loginType), "MainFragment")
                         .commit();
@@ -51,7 +77,10 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
 
     }
 
-    private void initInstance() {
+    private void initInstances() {
+
+        accountManager = AccountManager.getInstance();
+
         toolbar = (Toolbar) findViewById(R.id.toolBar);
         setSupportActionBar(toolbar);
 
@@ -69,6 +98,9 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
+
+        btnLogout = (Button) findViewById(R.id.btnLogOut);
+        btnLogout.setOnClickListener(this);
     }
 
     @Override
@@ -108,7 +140,23 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
 
     @Override
     public void onPhotoItemClicked(HitDao dao) {
-//        Intent intent = new Intent(MainActivity.this, MoreInfoActivity.class);
-//        startActivity(intent);
+        Intent intent = new Intent(MainActivity.this, MoreInfoActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btnLogOut: {
+                if (accountManager.getLoginType() == R.integer.login_type_facebook) {
+                    accountManager.logOutFacebook();
+                }
+                else if (accountManager.getLoginType() == R.integer.login_type_google) {
+                    accountManager.logOutGoogle();
+                }
+                Intent signInIntent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(signInIntent);
+            }
+        }
     }
 }

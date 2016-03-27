@@ -8,6 +8,8 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:name=".MainApplication"
@@ -39,7 +41,11 @@
             android:name="com.natavit.cooklycook.configuration.GlideConfiguration"
             android:value="GlideModule" />
 
-        <activity android:name=".activity.AnimationActivity"></activity>
+        <activity android:name=".activity.AnimationActivity" />
+        <activity
+            android:name=".activity.MoreInfoActivity"
+            android:label="@string/title_activity_more_info"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

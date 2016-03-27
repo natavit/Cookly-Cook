@@ -19,7 +19,7 @@ public class FoodListManager {
     private Context mContext;
     private FoodCollectionDao dao;
 
-    private int nextPage;
+    private int nextPage = -1;
 
     public FoodListManager() {
         mContext = Contextor.getInstance().getContext();
