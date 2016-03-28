@@ -1,30 +1,85 @@
 package com.natavit.cooklycook.activity;
 
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.natavit.cooklycook.R;
+import com.natavit.cooklycook.dao.HitDao;
 
-public class MoreInfoActivity extends AppCompatActivity {
+public class MoreInfoActivity extends AppCompatActivity implements View.OnClickListener {
+
+    CollapsingToolbarLayout collapsingToolbarLayout;
+    FloatingActionButton fab;
+    Toolbar toolbar;
+
+    TextView tvFoodName;
+    ImageView imageViewHeader;
+
+    HitDao dao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_more_info);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        initInstances();
+    }
+
+    private void initInstances() {
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+        dao = getIntent().getParcelableExtra("dao");
+
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        collapsingToolbarLayout.setTitle(dao.getRecipe().getLabel());
+        collapsingToolbarLayout.setExpandedTitleColor(ContextCompat.getColor(MoreInfoActivity.this, android.R.color.transparent));
+
+        tvFoodName = (TextView) findViewById(R.id.tvFoodName);
+        String ingredient = "";
+        for (String i : dao.getRecipe().getIngredientLines()) {
+            ingredient += i + "\n";
+        }
+        tvFoodName.setText(ingredient);
+
+        imageViewHeader = (ImageView) findViewById(R.id.imageViewHeader);
+        Glide.with(MoreInfoActivity.this)
+                .load(dao.getRecipe().getImage())
+                .placeholder(R.drawable.loading)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+//                .error() put image when unsuccessful downloading occurs
+                .into(imageViewHeader);
+
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(this);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home: {
+                finish();
+                return true;
             }
-        });
+            default:
+                return false;
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+
     }
 }

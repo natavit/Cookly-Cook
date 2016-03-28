@@ -28,6 +28,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.MainActivity" />
+        <activity android:name=".activity.AnimationActivity" />
+        <activity
+            android:name=".activity.MoreInfoActivity"
+            android:label="@string/title_activity_more_info" />
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
@@ -41,11 +45,6 @@
             android:name="com.natavit.cooklycook.configuration.GlideConfiguration"
             android:value="GlideModule" />
 
-        <activity android:name=".activity.AnimationActivity" />
-        <activity
-            android:name=".activity.MoreInfoActivity"
-            android:label="@string/title_activity_more_info"
-            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

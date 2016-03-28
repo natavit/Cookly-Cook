@@ -19,7 +19,7 @@
             android:weightSum="2">
 
             <ImageView
-                android:padding="32dp"
+                android:layout_marginTop="64dp"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_gravity="center"
@@ -27,13 +27,13 @@
                 android:src="@drawable/logo" />
 
             <LinearLayout
+                android:id="@+id/linearLayoutLoginBtn"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:padding="64dp"
-                android:id="@+id/linearLayoutLoginBtn">
+                android:padding="64dp">
 
                 <mehdi.sakout.fancybuttons.FancyButton
                     android:id="@+id/btnLoginFacebook"
@@ -46,6 +46,7 @@
                     fancy:fb_fontIconResource="&#xf082;"
                     fancy:fb_fontIconSize="30dp"
                     fancy:fb_iconPosition="left"
+                    fancy:fb_radius="5dp"
                     fancy:fb_text="@string/sign_in_with_facebook"
                     fancy:fb_textSize="17sp" />
 
@@ -60,17 +61,18 @@
                     fancy:fb_fontIconResource="&#xf1a0;"
                     fancy:fb_fontIconSize="30dp"
                     fancy:fb_iconPosition="left"
+                    fancy:fb_radius="5dp"
                     fancy:fb_text="@string/sign_in_with_google"
                     fancy:fb_textSize="17sp" />
 
                 <!--<TextView-->
-                    <!--android:id="@+id/btnLoginGuest"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:background="@drawable/btn_guest_signin"-->
-                    <!--android:text="@string/sign_in_as_guest"-->
-                    <!--android:textColor="@android:color/white"-->
-                    <!--android:textSize="12sp" />-->
+                <!--android:id="@+id/btnLoginGuest"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:background="@drawable/btn_guest_signin"-->
+                <!--android:text="@string/sign_in_as_guest"-->
+                <!--android:textColor="@android:color/white"-->
+                <!--android:textSize="12sp" />-->
 
             </LinearLayout>
 

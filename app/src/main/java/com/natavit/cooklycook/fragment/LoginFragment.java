@@ -121,9 +121,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
         initInstances(rootView);
 
-        if (!Utils.getInstance().isOnline())
-            Utils.getInstance().showSnackBarLong("Offline Mode", coordinatorLayout);
-
 //        initGuestInstances(rootView);
         initFacebookInstances(rootView);
         initGoogleInstances(rootView);
@@ -211,9 +208,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             startActivity(i);
             getActivity().finish();
         }
-        else {
-            Utils.getInstance().showSnackBarLong("Log in failed", coordinatorLayout);
-        }
     }
     // End Google //
 
@@ -297,16 +291,23 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btnLoginFacebook:
-                logInFacebook();
-                break;
-            case R.id.btnLoginGoogle:
-                logInGoogle();
-                break;
-//            case R.id.btnLoginGuest:
-//                logInGuest();
-//                break;
+        if (!Utils.getInstance().isOnline()) {
+            Utils.getInstance().showSnackBarShort("No Internet Connection", coordinatorLayout);
+        }
+        else {
+            switch (v.getId()) {
+                case R.id.btnLoginFacebook: {
+                    logInFacebook();
+                    break;
+                }
+
+                case R.id.btnLoginGoogle:
+                    logInGoogle();
+                    break;
+//                case R.id.btnLoginGuest:
+//                    logInGuest();
+//                    break;
+            }
         }
     }
 

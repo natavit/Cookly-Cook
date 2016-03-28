@@ -14,11 +14,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.AccessToken;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.gson.Gson;
 import com.natavit.cooklycook.R;
 import com.natavit.cooklycook.adapter.FoodListAdapter;
 import com.natavit.cooklycook.dao.FoodCollectionDao;
@@ -29,9 +24,6 @@ import com.natavit.cooklycook.manager.Contextor;
 import com.natavit.cooklycook.manager.FoodListManager;
 import com.natavit.cooklycook.manager.HttpManager;
 import com.natavit.cooklycook.util.Utils;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -62,9 +54,6 @@ public class MainFragment extends Fragment {
      */
 
     private static int loginType;
-
-    // Google variable
-    private GoogleSignInAccount acct;
 
     // View
     TextView tvName;
@@ -132,15 +121,15 @@ public class MainFragment extends Fragment {
             Utils.getInstance().showSnackBarLong("Offline Mode", coordinatorLayout);
 
         accountManager.setLoginType(getLoginType());
-        if (getLoginType() == R.integer.login_type_facebook) {
-            initFacebookInstances(rootView, savedInstanceState);
-        }
-        else if (getLoginType() == R.integer.login_type_google) {
-            initGoogleInstances(rootView, savedInstanceState);
-        }
-        else {
-//            initGuestInstances(rootView, savedInstanceState);
-        }
+//        if (getLoginType() == R.integer.login_type_facebook) {
+////            initFacebookInstances(rootView, savedInstanceState);
+//        }
+//        else if (getLoginType() == R.integer.login_type_google) {
+////            initGoogleInstances(rootView, savedInstanceState);
+//        }
+//        else {
+////            initGuestInstances(rootView, savedInstanceState);
+//        }
 
         return rootView;
     }
@@ -159,8 +148,8 @@ public class MainFragment extends Fragment {
         loginType = getArguments().getInt("loginType");
 
         coordinatorLayout = (CoordinatorLayout) rootView.findViewById(R.id.coordinatorLayout);
-        tvName = (TextView) rootView.findViewById(R.id.tvName);
-        tvEmail = (TextView) rootView.findViewById(R.id.tvEmail);
+//        tvName = (TextView) rootView.findViewById(R.id.tvName);
+//        tvEmail = (TextView) rootView.findViewById(R.id.tvEmail);
 //        tvGender = (TextView) rootView.findViewById(R.id.tvGender);
 
         listView = (ListView) rootView.findViewById(R.id.listView);
@@ -173,92 +162,6 @@ public class MainFragment extends Fragment {
         if (savedInstanceState == null)
             refreshData();
     }
-
-    /**
-     * Initialize Facebook Variables
-     * @param rootView
-     * @param savedInstanceState
-     */
-    private void initFacebookInstances(View rootView, Bundle savedInstanceState) {
-//        btnLogoutFacebook = (FancyButton) rootView.findViewById(R.id.btnLogoutFacebook);
-//
-////        tvGender.setVisibility(View.VISIBLE);
-//        btnLogoutFacebook.setVisibility(View.VISIBLE);
-//        btnLogoutFacebook.setOnClickListener(this);
-
-        String json = accountManager.loadCacheGraphRequest();
-        if (json == null) {
-            graphRequest();
-        }
-        else {
-            try {
-                JSONObject object = new Gson().fromJson(json, JSONObject.class);
-                tvName.setText(getString(R.string.signed_in_fmt, object.getString("name")));
-                tvEmail.setText(getString(R.string.email_in_fmt, object.getString("email")));
-//                tvGender.setText(getString(R.string.gender_in_fmt, object.getString("gender")));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-
-//        tvName.setText(getString(R.string.signed_in_fmt, Profile.getCurrentProfile().getName()));
-
-    }
-
-    private void graphRequest() {
-        GraphRequest request = GraphRequest.newMeRequest(
-                AccessToken.getCurrentAccessToken(),
-                new GraphRequest.GraphJSONObjectCallback() {
-                    @Override
-                    public void onCompleted(
-                            JSONObject object,
-                            GraphResponse response) {
-                        // Application code
-                        try {
-                            tvName.setText(getString(R.string.signed_in_fmt, object.getString("name")));
-                            tvEmail.setText(getString(R.string.email_in_fmt, object.getString("email")));
-
-                            // Cache user's information
-                            accountManager.saveCacheGraphRequest(object);
-
-                        } catch (NullPointerException e) {
-                            if (Utils.getInstance().isOnline()) {
-                                Utils.getInstance().showToast("Session Expired");
-                                accountManager.logOutFacebook();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-
-        Bundle parameters = new Bundle();
-        parameters.putString("fields", "id,name,link,email,gender");
-        request.setParameters(parameters);
-        request.executeAsync();
-    }
-
-    // End Facebook //
-
-    /**
-     * Initialize Google Variables
-     * @param rootView
-     * @param savedInstanceState
-     */
-    private void initGoogleInstances(View rootView, Bundle savedInstanceState) {
-        acct = getArguments().getParcelable("acct");
-
-        accountManager.setupGoogleApiClient(getActivity());
-
-        tvName.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
-        tvEmail.setText(getString(R.string.email_in_fmt, acct.getEmail()));
-//        btnLogoutGoogle = (FancyButton) rootView.findViewById(R.id.btnLogoutGoogle);
-//        btnLogoutGoogle.setVisibility(View.VISIBLE);
-//        btnLogoutGoogle.setOnClickListener(this);
-    }
-
-
-    // End Google //
 
 //    /**
 //     * Initialize Guest Variables
