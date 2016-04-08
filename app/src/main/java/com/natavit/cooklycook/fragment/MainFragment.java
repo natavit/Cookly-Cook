@@ -1,7 +1,6 @@
 package com.natavit.cooklycook.fragment;
 
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
@@ -11,8 +10,6 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.natavit.cooklycook.R;
 import com.natavit.cooklycook.adapter.FoodListAdapter;
@@ -20,7 +17,6 @@ import com.natavit.cooklycook.dao.FoodCollectionDao;
 import com.natavit.cooklycook.dao.HitDao;
 import com.natavit.cooklycook.datatype.MutableInteger;
 import com.natavit.cooklycook.manager.AccountManager;
-import com.natavit.cooklycook.manager.Contextor;
 import com.natavit.cooklycook.manager.FoodListManager;
 import com.natavit.cooklycook.manager.HttpManager;
 import com.natavit.cooklycook.util.Utils;
@@ -53,17 +49,6 @@ public class MainFragment extends Fragment {
      *
      */
 
-    private static int loginType;
-
-    // View
-    TextView tvName;
-    TextView tvEmail;
-
-//    TextView tvGender;
-//    FancyButton btnLogoutFacebook;
-//    FancyButton btnLogoutGoogle;
-//    FancyButton btnLogoutGuest;
-
     CoordinatorLayout coordinatorLayout;
 
     boolean isLoadingMore = false;
@@ -77,6 +62,8 @@ public class MainFragment extends Fragment {
 
     AccountManager accountManager;
 
+    String foodName;
+
     /**
      *
      * Function
@@ -87,10 +74,9 @@ public class MainFragment extends Fragment {
         super();
     }
 
-    public static MainFragment newInstance(Parcelable acct, int loginType) {
+    public static MainFragment newInstance(int loginType) {
         MainFragment fragment = new MainFragment();
         Bundle args = new Bundle();
-        if (acct != null) args.putParcelable("acct", acct);
         args.putInt("loginType", loginType);
         fragment.setArguments(args);
         return fragment;
@@ -120,37 +106,26 @@ public class MainFragment extends Fragment {
         if (!Utils.getInstance().isOnline())
             Utils.getInstance().showSnackBarLong("Offline Mode", coordinatorLayout);
 
-        accountManager.setLoginType(getLoginType());
-//        if (getLoginType() == R.integer.login_type_facebook) {
-////            initFacebookInstances(rootView, savedInstanceState);
-//        }
-//        else if (getLoginType() == R.integer.login_type_google) {
-////            initGoogleInstances(rootView, savedInstanceState);
-//        }
-//        else {
-////            initGuestInstances(rootView, savedInstanceState);
-//        }
-
         return rootView;
     }
 
     private void init(Bundle savedInstanceState) {
         // Initialize Fragment level's variable(s)
+
+        foodName = AccountManager.getInstance().getFoodName();
+
         foodListManager = new FoodListManager();
         lastPositionInteger = new MutableInteger(-1);
         accountManager = AccountManager.getInstance();
+
 //        SharedPreferences prefs = getContext().getSharedPreferences("dummy",
 //                Context.MODE_PRIVATE);
     }
 
     private void initInstances(View rootView, Bundle savedInstanceState) {
         // init instance with rootView.findViewById here
-        loginType = getArguments().getInt("loginType");
 
         coordinatorLayout = (CoordinatorLayout) rootView.findViewById(R.id.coordinatorLayout);
-//        tvName = (TextView) rootView.findViewById(R.id.tvName);
-//        tvEmail = (TextView) rootView.findViewById(R.id.tvEmail);
-//        tvGender = (TextView) rootView.findViewById(R.id.tvGender);
 
         listView = (ListView) rootView.findViewById(R.id.listView);
         listAdapter = new FoodListAdapter(lastPositionInteger);
@@ -159,30 +134,11 @@ public class MainFragment extends Fragment {
         listView.setOnItemClickListener(listViewItemClickListener);
         listView.setOnScrollListener(listViewScrollListener);
 
-        if (savedInstanceState == null)
+        if (savedInstanceState == null) {
             refreshData();
+        }
+
     }
-
-//    /**
-//     * Initialize Guest Variables
-//     * @param rootView
-//     * @param savedInstanceState
-//     */
-//    private void initGuestInstances(View rootView, Bundle savedInstanceState) {
-//        btnLogoutGuest = (FancyButton) rootView.findViewById(R.id.btnLogoutGuest);
-//        btnLogoutGuest.setVisibility(View.VISIBLE);
-//        btnLogoutGuest.setOnClickListener(this);
-//
-//        tvName.setText(getString(R.string.signed_in_fmt, "Guest"));
-//        tvEmail.setVisibility(View.GONE);
-//    }
-//
-//    private void logOutGuest() {
-//        clearFoodCache();
-//        startLoginActivity();
-//    }
-    // End Guest //
-
 
     /**
      *
@@ -190,21 +146,6 @@ public class MainFragment extends Fragment {
      *
      */
 
-    private int getLoginType() {
-        if (loginType == R.integer.login_type_facebook)
-            return R.integer.login_type_facebook;
-
-        if (loginType == R.integer.login_type_google)
-            return R.integer.login_type_google;
-
-        return R.integer.login_type_guest;
-    }
-
-//    private void startLoginActivity() {
-//        Intent signInIntent = new Intent(getActivity(), LoginActivity.class);
-//        startActivity(signInIntent);
-//        getActivity().finish();
-//    }
 
     private void refreshData() {
         if (foodListManager.getCount() == 0) {
@@ -216,7 +157,7 @@ public class MainFragment extends Fragment {
     private void reloadData() {
         Call<FoodCollectionDao> call = HttpManager.getInstance()
                 .getService()
-                .loadFoodList("Hamburger");
+                .loadFoodList(foodName);
         call.enqueue(new FoodListLoadCallback(FoodListLoadCallback.MODE_RELOAD));
     }
 
@@ -228,13 +169,14 @@ public class MainFragment extends Fragment {
         int nextPage = foodListManager.getNextPage();
         Call<FoodCollectionDao> call = HttpManager.getInstance()
                 .getService()
-                .loadMoreFoodList("Hamburger", nextPage, nextPage+10);
+                .loadMoreFoodList(foodName, nextPage, nextPage+10);
         call.enqueue(new FoodListLoadCallback(FoodListLoadCallback.MODE_LOAD_MORE));
     }
 
     @Override
     public void onStart() {
         super.onStart();
+
     }
 
     @Override
@@ -272,28 +214,6 @@ public class MainFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-    }
-
-//    @Override
-//    public void onClick(View v) {
-//        switch (v.getId()) {
-//            case R.id.btnLogoutFacebook:
-//                logOutFacebook();
-//                break;
-//            case R.id.btnLogoutGoogle:
-//                logOutGoogle();
-//                break;
-//            case R.id.btnLogoutGuest:
-//                logOutGuest();
-//                break;
-//        }
-//    }
-
-    private void showToast(String message) {
-        Toast.makeText(Contextor.getInstance().getContext(),
-                message,
-                Toast.LENGTH_SHORT)
-                .show();
     }
 
     /**
@@ -381,7 +301,7 @@ public class MainFragment extends Fragment {
                 clearLoadingMoreFlagIfCapable(mode);
 
                 try {
-                    showToast(response.errorBody().string());
+                    Utils.getInstance().showToast(response.errorBody().string());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -393,7 +313,7 @@ public class MainFragment extends Fragment {
 
             clearLoadingMoreFlagIfCapable(mode);
 
-            showToast(t.toString());
+            Utils.getInstance().showToast(t.toString());
         }
 
         private void clearLoadingMoreFlagIfCapable(int mode) {

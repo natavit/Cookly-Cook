@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group android:checkableBehavior="all">
+    <group android:checkableBehavior="none">
         <item
             android:id="@+id/navSetting"
             android:icon="@drawable/ic_settings_white_24dp"
-            android:title="@string/app_setting"/>
+            android:title="@string/action_setting"/>
     </group>
 
 </menu>

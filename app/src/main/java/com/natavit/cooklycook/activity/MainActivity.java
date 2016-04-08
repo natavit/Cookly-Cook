@@ -2,7 +2,9 @@ package com.natavit.cooklycook.activity;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -49,9 +51,9 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
 
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle actionBarDrawerToggle;
-    ImageView ivProfileHeader;
 
     NavigationView navigationView;
+    ImageView ivProfileHeader;
 
     Toolbar toolbar;
     CoordinatorLayout coordinatorLayout;
@@ -61,6 +63,8 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
     TextView tvProfileEmail;
 
     AccountManager accountManager;
+
+    String foodName;
 
     /**
      *
@@ -77,27 +81,21 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
 
         if (savedInstanceState == null) {
 
-            int loginType = getIntent().getIntExtra("loginType", R.integer.login_type_guest);
-
-            if (loginType == R.integer.login_type_google) {
+            if (accountManager.getLoginType() == R.integer.login_type_google) {
                 initGoogleInstances();
-                getSupportFragmentManager().beginTransaction()
-                        .add(R.id.contentContainer, MainFragment.newInstance(null, loginType), "MainFragment")
-                        .commit();
             }
-            else if (loginType == R.integer.login_type_facebook) {
+            else if (accountManager.getLoginType() == R.integer.login_type_facebook) {
                 initFacebookInstances();
-                getSupportFragmentManager().beginTransaction()
-                        .add(R.id.contentContainer, MainFragment.newInstance(null, loginType), "MainFragment")
-                        .commit();
             }
+
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.contentContainer, MainFragment.newInstance(accountManager.getLoginType()), "MainFragment")
+                    .commit();
         }
 
     }
 
     private void initInstances() {
-        accountManager = AccountManager.getInstance();
-
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -118,6 +116,12 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
 
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
 
+        foodName = PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+                .getString(getString(R.string.pref_food_key), getString(R.string.pref_food_default));
+
+        accountManager = AccountManager.getInstance();
+        accountManager.setFoodName(foodName);
+        accountManager.setLoginType(getIntent().getIntExtra("loginType", R.integer.login_type_guest));
     }
 
     private void setupNavigationView() {
@@ -128,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
                 switch (item.getItemId()) {
                     case R.id.navSetting: {
 //                        item.setChecked(true);
+                        startActivity(new Intent(MainActivity.this, SettingsActivity.class));
                         drawerLayout.closeDrawers();
                         return true;
                     }
@@ -139,13 +144,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
         View headerLayout = navigationView.getHeaderView(0);
         tvProfileName = (TextView) headerLayout.findViewById(R.id.tvProfileName);
         tvProfileEmail = (TextView) headerLayout.findViewById(R.id.tvProfileEmail);
-        ImageView ivProfileHeader = (ImageView) headerLayout.findViewById(R.id.ivProfileHeader);
-        Glide.with(MainActivity.this)
-                .load(Profile.getCurrentProfile().getProfilePictureUri(300, 300))
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .bitmapTransform(new CropCircleTransformation(MainActivity.this))
-//                .error() put image when unsuccessful downloading occurs
-                .into(ivProfileHeader);
+        ivProfileHeader = (ImageView) headerLayout.findViewById(R.id.ivProfileHeader);
 
         btnLogout = (FancyButton) findViewById(R.id.btnLogOut);
         btnLogout.setOnClickListener(this);
@@ -170,10 +169,13 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
 //                tvEmail.setText(getString(R.string.email_in_fmt, object.getString("email")));
                 tvProfileName.setText(object.getString("name"));
                 tvProfileEmail.setText(object.getString("email"));
+                setProfileHeaderImage(Profile.getCurrentProfile().getProfilePictureUri(300, 300));
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+
 
 //        tvName.setText(getString(R.string.signed_in_fmt, Profile.getCurrentProfile().getName()));
 
@@ -193,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
 //                            tvEmail.setText(getString(R.string.email_in_fmt, object.getString("email")));
                             tvProfileName.setText(object.getString("name"));
                             tvProfileEmail.setText(object.getString("email"));
+                            setProfileHeaderImage(Profile.getCurrentProfile().getProfilePictureUri(300, 300));
 
                             // Cache user's information
                             accountManager.saveCacheGraphRequest(object);
@@ -209,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
                 });
 
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "id,name,link,email,gender");
+        parameters.putString("fields", "id,name,link,email,gender,picture");
         request.setParameters(parameters);
         request.executeAsync();
     }
@@ -228,12 +231,24 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
         accountManager.setupGoogleApiClient(MainActivity.this);
 
 //        tvName.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
-//        tvEmail.setText(getString(R.string.email_in_fmt, acct.getEmail()));
         tvProfileName.setText(acct.getDisplayName());
         tvProfileEmail.setText(acct.getEmail());
+
+        setProfileHeaderImage(acct.getPhotoUrl());
+
+
     }
 
     // End Google //
+
+    private void setProfileHeaderImage(Uri uri) {
+        Glide.with(MainActivity.this)
+                .load(uri)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .bitmapTransform(new CropCircleTransformation(MainActivity.this))
+//                .error() put image when unsuccessful downloading occurs
+                .into(ivProfileHeader);
+    }
 
 
     @Override
@@ -242,6 +257,25 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
 
         // Logs 'install' and 'app activate' App Events.
         AppEventsLogger.activateApp(this);
+
+        String fn = PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+                .getString(getString(R.string.pref_food_key), getString(R.string.pref_food_default));
+
+        if (!accountManager.getFoodName().toUpperCase().equals(fn.toUpperCase())) {
+            Utils.getInstance().showSnackBarShort("Loading new recipes...", coordinatorLayout);
+            accountManager.setFoodName(fn);
+            accountManager.clearFoodCache();
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.contentContainer,
+                    MainFragment.newInstance(accountManager.getLoginType()),
+                    "MainFragment")
+                    .commit();
+
+        }
+        else {
+//            Utils.getInstance().showSnackBarShort(accountManager.getFoodName() + " " + foodName, coordinatorLayout);
+        }
     }
 
     @Override
@@ -289,9 +323,13 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
                 else if (accountManager.getLoginType() == R.integer.login_type_google) {
                     accountManager.logOutGoogle();
                 }
+
+                PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+                        .edit().clear().commit();
+
                 Intent signInIntent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(signInIntent);
-                break;
+                finish();
             }
         }
     }

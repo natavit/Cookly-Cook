@@ -24,6 +24,8 @@ public class AccountManager {
 
     private static int loginType;
 
+    private static String foodName;
+
     private GoogleApiClient googleApiClient;
 
     public static AccountManager getInstance() {
@@ -48,7 +50,15 @@ public class AccountManager {
         return loginType;
     }
 
-    private void clearFoodCache() {
+    public void setFoodName(String name) {
+        foodName = name;
+    }
+
+    public String getFoodName() {
+        return foodName;
+    }
+
+    public void clearFoodCache() {
         mContext.getSharedPreferences("food",
                 Context.MODE_PRIVATE)
                 .edit().clear().commit();

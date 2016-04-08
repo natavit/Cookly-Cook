@@ -16,6 +16,9 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.natavit.cooklycook.R;
 import com.natavit.cooklycook.dao.HitDao;
 
+/**
+ * Created by Natavit on 2/4/2016 AD.
+ */
 public class MoreInfoActivity extends AppCompatActivity implements View.OnClickListener {
 
     CollapsingToolbarLayout collapsingToolbarLayout;
