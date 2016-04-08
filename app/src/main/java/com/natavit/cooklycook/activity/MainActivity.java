@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -27,6 +29,7 @@ import com.facebook.appevents.AppEventsLogger;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.gson.Gson;
 import com.natavit.cooklycook.R;
+import com.natavit.cooklycook.adapter.PagerAdapter;
 import com.natavit.cooklycook.dao.HitDao;
 import com.natavit.cooklycook.fragment.MainFragment;
 import com.natavit.cooklycook.manager.AccountManager;
@@ -56,6 +59,9 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
     ImageView ivProfileHeader;
 
     Toolbar toolbar;
+    TabLayout tabLayout;
+    ViewPager viewPager;
+    PagerAdapter pagerAdapter;
     CoordinatorLayout coordinatorLayout;
 
     FancyButton btnLogout;
@@ -66,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
 
     String foodName;
 
+
     /**
      *
      * Function
@@ -75,9 +82,12 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main2);
-        
+        setContentView(R.layout.activity_main);
+
         initInstances();
+
+        if (!Utils.getInstance().isOnline())
+            Utils.getInstance().showSnackBarLong("Offline Mode", coordinatorLayout);
 
         if (savedInstanceState == null) {
 
@@ -88,19 +98,22 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
                 initFacebookInstances();
             }
 
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.contentContainer, MainFragment.newInstance(accountManager.getLoginType()), "MainFragment")
-                    .commit();
+//            getSupportFragmentManager().beginTransaction()
+//                    .add(R.id.contentContainer, MainFragment.newInstance(accountManager.getLoginType()), "MainFragment")
+//                    .commit();
         }
 
     }
 
     private void initInstances() {
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+        setupTabs();
 
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         actionBarDrawerToggle = new ActionBarDrawerToggle(
                 MainActivity.this,
                 drawerLayout,
@@ -114,14 +127,40 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
 
         setupNavigationView();
 
-        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
-
         foodName = PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
                 .getString(getString(R.string.pref_food_key), getString(R.string.pref_food_default));
 
         accountManager = AccountManager.getInstance();
         accountManager.setFoodName(foodName);
         accountManager.setLoginType(getIntent().getIntExtra("loginType", R.integer.login_type_guest));
+    }
+
+    private void setupTabs() {
+        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+        tabLayout.addTab(tabLayout.newTab().setText("Recipes"));
+        tabLayout.addTab(tabLayout.newTab().setText("My Recipes"));
+
+        viewPager = (ViewPager) findViewById(R.id.viewPager);
+        pagerAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
+        viewPager.setAdapter(pagerAdapter);
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+
+        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
     }
 
     private void setupNavigationView() {

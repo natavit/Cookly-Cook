@@ -2,7 +2,6 @@ package com.natavit.cooklycook.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,8 +47,6 @@ public class MainFragment extends Fragment {
      * Variable
      *
      */
-
-    CoordinatorLayout coordinatorLayout;
 
     boolean isLoadingMore = false;
 
@@ -103,9 +100,6 @@ public class MainFragment extends Fragment {
 
         initInstances(rootView, savedInstanceState);
 
-        if (!Utils.getInstance().isOnline())
-            Utils.getInstance().showSnackBarLong("Offline Mode", coordinatorLayout);
-
         return rootView;
     }
 
@@ -124,8 +118,6 @@ public class MainFragment extends Fragment {
 
     private void initInstances(View rootView, Bundle savedInstanceState) {
         // init instance with rootView.findViewById here
-
-        coordinatorLayout = (CoordinatorLayout) rootView.findViewById(R.id.coordinatorLayout);
 
         listView = (ListView) rootView.findViewById(R.id.listView);
         listAdapter = new FoodListAdapter(lastPositionInteger);
