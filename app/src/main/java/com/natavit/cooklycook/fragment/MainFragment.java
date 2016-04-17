@@ -32,14 +32,15 @@ import retrofit2.Response;
  */
 public class MainFragment extends Fragment {
 
+
     /**
      *
      * Interface
      *
      */
 
-    public interface FragmentListener {
-        void onPhotoItemClicked(HitDao dao);
+    public interface MainFragmentListener {
+        void onRecipeItemClicked(HitDao dao);
     }
 
     /**
@@ -71,10 +72,10 @@ public class MainFragment extends Fragment {
         super();
     }
 
-    public static MainFragment newInstance(int loginType) {
+    public static MainFragment newInstance() {
         MainFragment fragment = new MainFragment();
         Bundle args = new Bundle();
-        args.putInt("loginType", loginType);
+//        args.putInt("loginType", loginType);
         fragment.setArguments(args);
         return fragment;
     }
@@ -112,8 +113,6 @@ public class MainFragment extends Fragment {
         lastPositionInteger = new MutableInteger(-1);
         accountManager = AccountManager.getInstance();
 
-//        SharedPreferences prefs = getContext().getSharedPreferences("dummy",
-//                Context.MODE_PRIVATE);
     }
 
     private void initInstances(View rootView, Bundle savedInstanceState) {
@@ -242,8 +241,8 @@ public class MainFragment extends Fragment {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             if (position < foodListManager.getCount()) {
                 HitDao dao = foodListManager.getDao().getHits().get(position);
-                FragmentListener listener = (FragmentListener) getActivity();
-                listener.onPhotoItemClicked(dao);
+                MainFragmentListener listener = (MainFragmentListener) getActivity();
+                listener.onRecipeItemClicked(dao);
             }
         }
     };
@@ -268,7 +267,6 @@ public class MainFragment extends Fragment {
 
         @Override
         public void onResponse(Call<FoodCollectionDao> call, Response<FoodCollectionDao> response) {
-//            swipeRefreshLayout.setRefreshing(false);
 
             if (response.isSuccess()) {
                 FoodCollectionDao dao = response.body();
@@ -287,7 +285,6 @@ public class MainFragment extends Fragment {
                 listAdapter.setDao(foodListManager.getDao());
                 listAdapter.notifyDataSetChanged();
 
-//                showToast("Load Completed");
             } else {
 
                 clearLoadingMoreFlagIfCapable(mode);

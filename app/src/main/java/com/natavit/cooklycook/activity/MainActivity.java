@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
@@ -44,7 +45,7 @@ import mehdi.sakout.fancybuttons.FancyButton;
 /**
  * Created by Natavit on 2/4/2016 AD.
  */
-public class MainActivity extends AppCompatActivity implements MainFragment.FragmentListener, View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements MainFragment.MainFragmentListener, View.OnClickListener {
 
     /**
      *
@@ -209,12 +210,12 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
                 tvProfileName.setText(object.getString("name"));
                 tvProfileEmail.setText(object.getString("email"));
                 setProfileHeaderImage(Profile.getCurrentProfile().getProfilePictureUri(300, 300));
+                accountManager.setName(object.getString("name"));
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-
 
 //        tvName.setText(getString(R.string.signed_in_fmt, Profile.getCurrentProfile().getName()));
 
@@ -238,6 +239,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
 
                             // Cache user's information
                             accountManager.saveCacheGraphRequest(object);
+                            accountManager.setName(object.getString("name"));
 
                         } catch (NullPointerException e) {
                             if (Utils.getInstance().isOnline()) {
@@ -272,6 +274,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
 //        tvName.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
         tvProfileName.setText(acct.getDisplayName());
         tvProfileEmail.setText(acct.getEmail());
+        accountManager.setName(acct.getDisplayName());
 
         setProfileHeaderImage(acct.getPhotoUrl());
 
@@ -307,7 +310,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
 
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.contentContainer,
-                    MainFragment.newInstance(accountManager.getLoginType()),
+                    MainFragment.newInstance(),
                     "MainFragment")
                     .commit();
 
@@ -323,6 +326,18 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
 
         // Logs 'app deactivate' App Event.
         AppEventsLogger.deactivateApp(this);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+        outState.putInt("tab", tabLayout.getSelectedTabPosition());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        viewPager.setCurrentItem(savedInstanceState.getInt("tab"));
     }
 
     @Override
@@ -346,7 +361,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
     }
 
     @Override
-    public void onPhotoItemClicked(HitDao dao) {
+    public void onRecipeItemClicked(HitDao dao) {
         Intent intent = new Intent(MainActivity.this, MoreInfoActivity.class);
         intent.putExtra("dao", dao);
         startActivity(intent);
@@ -381,5 +396,4 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
             super.onBackPressed();
         }
     }
-
 }

@@ -124,9 +124,9 @@ public class FoodListManager {
 
     }
 
-    public void clearCache() {
-        mContext.getSharedPreferences("food",
-                Context.MODE_PRIVATE)
-                .edit().clear().commit();
-    }
+//    public void clearCache() {
+//        mContext.getSharedPreferences("food",
+//                Context.MODE_PRIVATE)
+//                .edit().clear().commit();
+//    }
 }

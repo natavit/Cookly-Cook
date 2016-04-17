@@ -23,11 +23,9 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
 
         switch (position) {
             case 0:
-                MainFragment tab1 = new MainFragment();
-                return tab1;
+                return MainFragment.newInstance();
             case 1:
-                MyRecipeFragment tab2 = new MyRecipeFragment();
-                return tab2;
+                return MyRecipeFragment.newInstance();
             default:
                 return null;
         }
@@ -37,6 +35,5 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
     public int getCount() {
         return mNumOfTabs;
     }
-
 
 }

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fancy="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    tools:context="com.natavit.cooklycook.activity.EditRecipeActivity"
+    tools:showIn="@layout/activity_edit_recipe">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/add_recipe_img_margin">
+
+            <ImageView
+                android:id="@+id/ivImgRecipe"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop" />
+
+            <mehdi.sakout.fancybuttons.FancyButton
+                android:id="@+id/btnAddImgRecipe"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:padding="16dp"
+                fancy:fb_defaultColor="@color/colorPrimary"
+                fancy:fb_focusColor="@color/colorPrimaryDark"
+                fancy:fb_radius="5dp"
+                fancy:fb_text="Add Photo"
+                fancy:fb_textSize="16sp" />
+
+        </RelativeLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/input_layout_food_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp">
+
+            <EditText
+                android:id="@+id/etFoodName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_food_name"
+                android:imeOptions="actionNext"
+                android:singleLine="true">
+
+            </EditText>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayoutIngredient"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:orientation="vertical"
+            android:saveEnabled="true">
+
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/ivAddIngredient"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            android:src="@drawable/ic_add_black_48dp"
+            android:tint="@color/colorAccent" />
+
+    </LinearLayout>
+
+</android.support.v4.widget.NestedScrollView>

@@ -65,14 +65,14 @@
                     fancy:fb_text="@string/sign_in_with_google"
                     fancy:fb_textSize="17sp" />
 
-                <TextView
-                android:id="@+id/btnLoginGuest"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/btn_guest_signin"
-                android:text="@string/sign_in_as_guest"
-                android:textColor="@android:color/white"
-                android:textSize="12sp" />
+                <!--<TextView-->
+                <!--android:id="@+id/btnLoginGuest"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:background="@drawable/btn_guest_signin"-->
+                <!--android:text="@string/sign_in_as_guest"-->
+                <!--android:textColor="@android:color/white"-->
+                <!--android:textSize="12sp" />-->
 
             </LinearLayout>
 

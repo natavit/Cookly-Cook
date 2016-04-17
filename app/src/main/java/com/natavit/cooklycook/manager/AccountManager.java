@@ -24,6 +24,8 @@ public class AccountManager {
 
     private static int loginType;
 
+    private static String name;
+
     private static String foodName;
 
     private GoogleApiClient googleApiClient;
@@ -56,6 +58,14 @@ public class AccountManager {
 
     public String getFoodName() {
         return foodName;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String n) {
+        name = n;
     }
 
     public void clearFoodCache() {

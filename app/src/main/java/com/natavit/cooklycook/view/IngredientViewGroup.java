@@ -5,39 +5,33 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.EditText;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.inthecheesefactory.thecheeselibrary.view.BaseCustomViewGroup;
 import com.inthecheesefactory.thecheeselibrary.view.state.BundleSavedState;
 import com.natavit.cooklycook.R;
 
-
 /**
- * Created by Natavit on 2/11/2016 AD.
+ * Created by Natavit on 2/4/2016 AD.
  */
-public class FoodListItem extends BaseCustomViewGroup {
+public class IngredientViewGroup extends BaseCustomViewGroup {
 
-    TextView tvName;
-    ImageView ivImg;
+    EditText etIngName;
+    EditText etIngAmount;
 
-    public FoodListItem(Context context) {
+    public IngredientViewGroup(Context context) {
         super(context);
         initInflate();
         initInstances();
     }
 
-    public FoodListItem(Context context, AttributeSet attrs) {
+    public IngredientViewGroup(Context context, AttributeSet attrs) {
         super(context, attrs);
         initInflate();
         initInstances();
         initWithAttrs(attrs, 0, 0);
     }
 
-    public FoodListItem(Context context, AttributeSet attrs, int defStyleAttr) {
+    public IngredientViewGroup(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initInflate();
         initInstances();
@@ -45,7 +39,7 @@ public class FoodListItem extends BaseCustomViewGroup {
     }
 
     @TargetApi(21)
-    public FoodListItem(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public IngredientViewGroup(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         initInflate();
         initInstances();
@@ -53,13 +47,13 @@ public class FoodListItem extends BaseCustomViewGroup {
     }
 
     private void initInflate() {
-        inflate(getContext(), R.layout.list_item_food_card_view, this);
+        inflate(getContext(), R.layout.ingredient_layout, this);
     }
 
     private void initInstances() {
         // findViewById here
-        tvName = (TextView) findViewById(R.id.tvName);
-        ivImg = (ImageView) findViewById(R.id.ivImg);
+        etIngName = (EditText) findViewById(R.id.etIngName);
+        etIngAmount = (EditText) findViewById(R.id.etIngAmount);
     }
 
     private void initWithAttrs(AttributeSet attrs, int defStyleAttr, int defStyleRes) {
@@ -77,6 +71,22 @@ public class FoodListItem extends BaseCustomViewGroup {
         */
     }
 
+    public String getIngredientName() {
+        return etIngName.getText().toString();
+    }
+
+    public String getIngredientAmount() {
+        return etIngAmount.getText().toString();
+    }
+
+    public void setEtIngName(String name) {
+        this.etIngName.setText(name);
+    }
+
+    public void setEtIngAmount(String amount) {
+        this.etIngAmount.setText(amount);
+    }
+
     @Override
     protected Parcelable onSaveInstanceState() {
         Parcelable superState = super.onSaveInstanceState();
@@ -85,6 +95,8 @@ public class FoodListItem extends BaseCustomViewGroup {
         // Save Instance State(s) here to the 'savedState.getBundle()'
         // for example,
         // savedState.getBundle().putString("key", value);
+        savedState.getBundle().putString("name", getIngredientName());
+        savedState.getBundle().putString("amount", getIngredientAmount());
 
         return savedState;
     }
@@ -95,36 +107,9 @@ public class FoodListItem extends BaseCustomViewGroup {
         super.onRestoreInstanceState(ss.getSuperState());
 
         Bundle bundle = ss.getBundle();
-        // Restore Stat//from bundle he//
+        // Restore State from bundle here
+        etIngName.setText(bundle.getString("name"));
+        etIngAmount.setText(bundle.getString("amount"));
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int width = MeasureSpec.getSize(widthMeasureSpec);
-        int height = width * 2 / 3;
-        int newHeightMeasureSpec = MeasureSpec.makeMeasureSpec(
-                height,
-                MeasureSpec.EXACTLY
-        );
-
-        // Send to Child views
-        super.onMeasure(widthMeasureSpec, newHeightMeasureSpec);
-
-        // Self
-        setMeasuredDimension(width, height);
-    }
-
-    public void setNameText(String text) {
-        tvName.setText(text);
-    }
-
-    public void setImageUrl(String url) {
-        Log.e("URL", url);
-        Glide.with(getContext())
-                .load(url)
-                .placeholder(R.drawable.loading)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-//                .error() put image when unsuccessful downloading occurs
-                .into(ivImg);
-    }
 }

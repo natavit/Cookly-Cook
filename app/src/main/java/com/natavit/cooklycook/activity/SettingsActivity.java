@@ -77,13 +77,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 //                }
 
             } else {
-//                String foodName = PreferenceManager.getDefaultSharedPreferences(preference.getContext())
-//                        .getString(preference.getContext().getString(R.string.pref_food_key),
-//                                preference.getContext().getString(R.string.pref_food_default));
-//
 //                Toast.makeText(preference.getContext(), stringValue + " " + foodName, Toast.LENGTH_SHORT).show();
 
-                    preference.setSummary(stringValue);
+                preference.setSummary(stringValue);
 
             }
             return true;
@@ -91,13 +87,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     };
 
     private static Preference.OnPreferenceClickListener moveCursorToEndClickListener =
-            new Preference.OnPreferenceClickListener()
-            {
+            new Preference.OnPreferenceClickListener() {
                 @Override
-                public boolean onPreferenceClick(Preference preference)
-                {
-                    EditTextPreference editPref = (EditTextPreference)preference;
-                    editPref.getEditText().setSelection( editPref.getText().length() );
+                public boolean onPreferenceClick(Preference preference) {
+                    EditTextPreference editPref = (EditTextPreference) preference;
+                    editPref.getEditText().setSelection(editPref.getText().length());
                     return true;
                 }
             };

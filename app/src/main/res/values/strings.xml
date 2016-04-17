@@ -23,16 +23,24 @@
     <string name="edamam_app_key">a64b3bb38b5e6ec2cc8e172a6e10b32f</string>
 
     <string name="title_activity_more_info">MoreInfoActivity</string>
+    <string name="title_activity_more_info_local">MoreInfoLocalActivity</string>
     <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_add_recipe">Add Recipe</string>
+    <string name="title_activity_edit_recipe">Edit Recipe</string>
 
     <string name="action_setting">Settings</string>
 
     <string name="pref_food_key">food_name</string>
     <string name="pref_food_default">Hamburger</string>
-    <string name="pref_food_label">Food Name</string>
+    <string name="pref_food_label">Food name</string>
 
     <string name="pref_about_label">About</string>
 
     <string name="pref_header_general">General</string>
+    <string name="hint_food_name">Food name</string>
+    <string name="hint_ing_name">Ingredient name</string>
+    <string name="hint_ing_amount">Amount</string>
+    <string name="album_name">CooklyCook</string>
+    <string name="action_delete">Delete</string>
 
 </resources>

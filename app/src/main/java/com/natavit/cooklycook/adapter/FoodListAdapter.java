@@ -88,7 +88,7 @@ public class FoodListAdapter extends BaseAdapter {
         HitDao dao = (HitDao) getItem(position);
 
         item.setNameText(dao.getRecipe().getLabel());
-        item.setDescriptionText("position: " + position);
+//        item.setDescriptionText("position: " + position);
         item.setImageUrl(dao.getRecipe().getImage());
 
         if (position > lastPositionInteger.getValue()) {
