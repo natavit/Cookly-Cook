@@ -40,7 +40,7 @@ public class MainFragment extends Fragment {
      */
 
     public interface MainFragmentListener {
-        void onRecipeItemClicked(HitDao dao);
+        void onRecipeItemClicked(View view, HitDao dao);
     }
 
     /**
@@ -242,7 +242,7 @@ public class MainFragment extends Fragment {
             if (position < foodListManager.getCount()) {
                 HitDao dao = foodListManager.getDao().getHits().get(position);
                 MainFragmentListener listener = (MainFragmentListener) getActivity();
-                listener.onRecipeItemClicked(dao);
+                listener.onRecipeItemClicked(view, dao);
             }
         }
     };

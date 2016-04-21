@@ -279,7 +279,8 @@ public class EditRecipeActivity extends AppCompatActivity implements View.OnClic
             if (ing != null) {
                 String ingredientName = ing.getIngredientName();
                 String ingredientAmount = ing.getIngredientAmount();
-                if (ingredientName != null & ingredientAmount != null) {
+                if (!ingredientName.equals("") && !ingredientName.equals(" ")
+                        && !ingredientAmount.equals("") && !ingredientAmount.equals(" ")) {
 //                    db.execSQL("UPDATE " + DBCooklyCook.TABLE_INGREDIENT + " SET "
 //                    + DBCooklyCook.COL_ING_NAME + "='" + ingredientName + "', "
 //                    + DBCooklyCook.COL_ING_AMOUNT + "='" + ingredientAmount + "', "

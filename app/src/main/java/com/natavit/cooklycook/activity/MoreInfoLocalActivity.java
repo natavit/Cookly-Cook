@@ -1,6 +1,7 @@
 package com.natavit.cooklycook.activity;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -119,7 +120,12 @@ public class MoreInfoLocalActivity extends AppCompatActivity implements View.OnC
                 Intent result = new Intent();
                 result.putExtra("isUpdated", isUpdated);
                 setResult(RESULT_OK, result);
-                finish();
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                    supportFinishAfterTransition();
+                else
+                    finish();
+
                 return true;
             }
             default:
@@ -140,9 +146,14 @@ public class MoreInfoLocalActivity extends AppCompatActivity implements View.OnC
 
     @Override
     public void onBackPressed() {
+
         Intent result = new Intent();
         result.putExtra("isUpdated", isUpdated);
         setResult(RESULT_OK, result);
-        finish();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            supportFinishAfterTransition();
+        else
+            finish();
     }
 }

@@ -3,20 +3,24 @@ package com.natavit.cooklycook.activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.transition.Explode;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -33,7 +37,9 @@ import com.natavit.cooklycook.R;
 import com.natavit.cooklycook.adapter.PagerAdapter;
 import com.natavit.cooklycook.dao.HitDao;
 import com.natavit.cooklycook.fragment.MainFragment;
+import com.natavit.cooklycook.fragment.MyRecipeFragment;
 import com.natavit.cooklycook.manager.AccountManager;
+import com.natavit.cooklycook.model.LocalRecipe;
 import com.natavit.cooklycook.util.Utils;
 
 import org.json.JSONException;
@@ -45,7 +51,8 @@ import mehdi.sakout.fancybuttons.FancyButton;
 /**
  * Created by Natavit on 2/4/2016 AD.
  */
-public class MainActivity extends AppCompatActivity implements MainFragment.MainFragmentListener, View.OnClickListener {
+public class MainActivity extends AppCompatActivity
+        implements MainFragment.MainFragmentListener, MyRecipeFragment.MyRecipeFragmentListener, View.OnClickListener {
 
     /**
      *
@@ -83,6 +90,16 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Main
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // inside your activity (if you did not enable transitions in your theme)
+            getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
+            // set an enter transition
+            getWindow().setEnterTransition(new Explode());
+            // set an exit transition
+            getWindow().setExitTransition(new Explode());
+        }
+
         setContentView(R.layout.activity_main);
 
         initInstances();
@@ -361,10 +378,35 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Main
     }
 
     @Override
-    public void onRecipeItemClicked(HitDao dao) {
-        Intent intent = new Intent(MainActivity.this, MoreInfoActivity.class);
-        intent.putExtra("dao", dao);
-        startActivity(intent);
+    public void onRecipeItemClicked(View view, HitDao dao) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Intent intent = new Intent(this, MoreInfoActivity.class);
+            intent.putExtra("dao", dao);
+            ActivityOptionsCompat options = ActivityOptionsCompat.
+                    makeSceneTransitionAnimation(this, view.findViewById(R.id.ivImg), "ivFood");
+            startActivity(intent, options.toBundle());
+        }
+        else {
+            Intent intent = new Intent(MainActivity.this, MoreInfoActivity.class);
+            intent.putExtra("dao", dao);
+            startActivity(intent);
+        }
+    }
+
+    @Override
+    public void onLocalRecipeItemClicked(View view, LocalRecipe recipe) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Intent intent = new Intent(this, MoreInfoLocalActivity.class);
+            intent.putExtra("recipe", recipe);
+            ActivityOptionsCompat options = ActivityOptionsCompat.
+                    makeSceneTransitionAnimation(this, view.findViewById(R.id.ivImg), "ivFood");
+            startActivityForResult(intent, MyRecipeFragment.REQUEST_MORE_INFO_CODE, options.toBundle());
+        }
+        else {
+            Intent intent = new Intent(this, MoreInfoLocalActivity.class);
+            intent.putExtra("recipe", recipe);
+            startActivity(intent);
+        }
     }
 
     @Override
@@ -396,4 +438,5 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Main
             super.onBackPressed();
         }
     }
+
 }

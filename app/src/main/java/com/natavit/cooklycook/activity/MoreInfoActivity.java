@@ -1,5 +1,6 @@
 package com.natavit.cooklycook.activity;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.content.ContextCompat;
@@ -67,7 +68,11 @@ public class MoreInfoActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home: {
-                finish();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                    supportFinishAfterTransition();
+                else
+                    finish();
+
                 return true;
             }
             default:
@@ -75,4 +80,12 @@ public class MoreInfoActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            supportFinishAfterTransition();
+        else
+            finish();
+
+    }
 }

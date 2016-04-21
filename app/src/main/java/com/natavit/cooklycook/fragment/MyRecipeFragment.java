@@ -15,7 +15,6 @@ import android.widget.ListView;
 
 import com.natavit.cooklycook.R;
 import com.natavit.cooklycook.activity.AddRecipeActivity;
-import com.natavit.cooklycook.activity.MoreInfoLocalActivity;
 import com.natavit.cooklycook.adapter.LocalFoodListAdapter;
 import com.natavit.cooklycook.datatype.MutableInteger;
 import com.natavit.cooklycook.manager.LocalFoodListManager;
@@ -24,11 +23,21 @@ import com.natavit.cooklycook.model.LocalRecipe;
 public class MyRecipeFragment extends Fragment implements View.OnClickListener {
 
     /**
+     *
+     * Interface
+     *
+     */
+
+    public interface MyRecipeFragmentListener {
+        void onLocalRecipeItemClicked(View view, LocalRecipe recipe);
+    }
+
+    /**
      * Variable
      */
 
-    private static final int REQUEST_ADD_RECIPE_CODE = 1111;
-    private static final int REQUEST_MORE_INFO_CODE = 2222;
+    public static final int REQUEST_ADD_RECIPE_CODE = 1111;
+    public static final int REQUEST_MORE_INFO_CODE = 2222;
 
     CoordinatorLayout coordinatorLayout;
 
@@ -157,9 +166,11 @@ public class MyRecipeFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.fab:
+            case R.id.fab: {
                 Intent intent = new Intent(getContext(), AddRecipeActivity.class);
                 startActivityForResult(intent, REQUEST_ADD_RECIPE_CODE);
+                break;
+            }
         }
     }
 
@@ -175,9 +186,8 @@ public class MyRecipeFragment extends Fragment implements View.OnClickListener {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             if (position < localFoodListManager.getCount()) {
                 LocalRecipe recipe = localFoodListManager.getLocalRecipes().get(position);
-                Intent intent = new Intent(getContext(), MoreInfoLocalActivity.class);
-                intent.putExtra("recipe", recipe);
-                startActivityForResult(intent, REQUEST_MORE_INFO_CODE);
+                MyRecipeFragmentListener listener = (MyRecipeFragmentListener) getActivity();
+                listener.onLocalRecipeItemClicked(view, recipe);
             }
         }
     };

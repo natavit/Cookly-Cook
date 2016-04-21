@@ -117,4 +117,6 @@ public class FoodListAdapter extends BaseAdapter {
     public void increaseLastPosition(int amount) {
         lastPositionInteger.setValue(lastPositionInteger.getValue() + amount);
     }
+
+
 }

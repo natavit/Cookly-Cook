@@ -250,7 +250,8 @@ public class AddRecipeActivity extends AppCompatActivity implements View.OnClick
                 if (ing != null) {
                     String ingredientName = ing.getIngredientName();
                     String ingredientAmount = ing.getIngredientAmount();
-                    if (ingredientName != null & ingredientAmount != null) {
+                    if (!ingredientName.equals("") && !ingredientName.equals(" ")
+                            && !ingredientAmount.equals("") && !ingredientAmount.equals(" ")) {
                         db.execSQL("INSERT INTO " + DBCooklyCook.TABLE_INGREDIENT + " ("
                                 + DBCooklyCook.COL_ING_NAME + ", " + DBCooklyCook.COL_ING_AMOUNT + ", " + DBCooklyCook.COL_ING_FOREIGN + ")"
                                 + " VALUES ('" + ingredientName + "', '" + ingredientAmount + "', '" + recipeName + "');");
