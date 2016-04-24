@@ -32,7 +32,6 @@ import retrofit2.Response;
  */
 public class MainFragment extends Fragment {
 
-
     /**
      *
      * Interface
@@ -104,6 +103,11 @@ public class MainFragment extends Fragment {
         return rootView;
     }
 
+    /**
+     * Initialize variable
+     * This method is usually called only once as long as it has not been destroyed by the system.
+     * Goal: To keep states and values of each variable
+     */
     private void init(Bundle savedInstanceState) {
         // Initialize Fragment level's variable(s)
 
@@ -115,6 +119,11 @@ public class MainFragment extends Fragment {
 
     }
 
+    /**
+     * Initialize view variables
+     * and is used to check whether this is the first time of creating this fragment
+     * if so, get new data
+     */
     private void initInstances(View rootView, Bundle savedInstanceState) {
         // init instance with rootView.findViewById here
 
@@ -137,14 +146,19 @@ public class MainFragment extends Fragment {
      *
      */
 
-
+    /**
+     * Check whether there is any data available
+     * if not, load a new one
+     */
     private void refreshData() {
         if (foodListManager.getCount() == 0) {
             reloadData();
-        } else {
         }
     }
 
+    /**
+     * Create a connection to Edamam's server to fetch data
+     */
     private void reloadData() {
         Call<FoodCollectionDao> call = HttpManager.getInstance()
                 .getService()
@@ -152,6 +166,9 @@ public class MainFragment extends Fragment {
         call.enqueue(new FoodListLoadCallback(FoodListLoadCallback.MODE_RELOAD));
     }
 
+    /**
+     * To Load another 10 data when a user scrolls down to the last item
+     */
     private void loadMoreData() {
         if (isLoadingMore) return;
 
@@ -165,19 +182,20 @@ public class MainFragment extends Fragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
+    public void onResume() {
+        super.onResume();
+        if (foodName != AccountManager.getInstance().getFoodName()) {
+            foodListManager.setDao(null);
+            listAdapter.setDao(foodListManager.getDao());
+            listAdapter.notifyDataSetChanged();
+            foodName = AccountManager.getInstance().getFoodName();
+            refreshData();
+        }
     }
 
     /*
-    * Save Instance State Here
-    */
+        * Save Instance State Here
+        */
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -199,20 +217,16 @@ public class MainFragment extends Fragment {
                 savedInstanceState.getBundle("lastPositionInteger"));
     }
 
-    /*
-     * Restore Instance State Here
-     */
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-    }
-
     /**
      *
      * Listener
      *
      */
 
+    /**
+     * Check scroll position
+     * if the visible item is the last one, then load more data
+     */
     AbsListView.OnScrollListener listViewScrollListener = new AbsListView.OnScrollListener() {
         @Override
         public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -229,13 +243,17 @@ public class MainFragment extends Fragment {
 
                     // Check if there are available data
                     if (foodListManager.getCount() > 0) {
-                        loadMoreData();
+                        if (Utils.getInstance().isOnline())
+                            loadMoreData();
                     }
                 }
             }
         }
     };
 
+    /**
+     * Listen to any click event on each item
+     */
     AdapterView.OnItemClickListener listViewItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

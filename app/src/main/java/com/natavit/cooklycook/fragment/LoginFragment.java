@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -28,7 +27,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.natavit.cooklycook.R;
-import com.natavit.cooklycook.activity.AnimationActivity;
 import com.natavit.cooklycook.activity.MainActivity;
 import com.natavit.cooklycook.util.Utils;
 
@@ -95,7 +93,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     private FancyButton btnLoginFacebook;
     private FancyButton btnLoginGoogle;
-    private TextView btnLoginGuest;
 
     /**
      *
@@ -120,14 +117,16 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         View rootView = inflater.inflate(R.layout.fragment_login, container, false);
 
         initInstances(rootView);
-
-//        initGuestInstances(rootView);
         initFacebookInstances(rootView);
         initGoogleInstances(rootView);
 
         return rootView;
     }
 
+
+    /**
+     * Initialize view variables
+     */
     private void initInstances(View rootView) {
         coordinatorLayout = (CoordinatorLayout) rootView.findViewById(R.id.coordinatorLayout);
 
@@ -158,10 +157,15 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         );
     }
 
+    /**
+     * Check Facebook Login Status
+     * If a user already logged in, then go to another activity directly
+     * @param newAccessToken a Token used to check login status
+     */
     private void updateFacebookToken(AccessToken newAccessToken) {
         if (newAccessToken != null) {
             Intent i = new Intent(getActivity(), MainActivity.class);
-            i.putExtra("loginType", R.integer.login_type_facebook);
+            i.putExtra("loginType", getResources().getInteger(R.integer.login_type_facebook));
             startActivity(i);
             getActivity().finish();
         } else {
@@ -198,34 +202,23 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
+    /**
+     * To check Google's Login result
+     * If success, go to another activity
+     * @param result a Result used to check Google's Login result
+     */
     private void handleSignInResult(GoogleSignInResult result) {
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
             Intent i = new Intent(getActivity(), MainActivity.class);
-            i.putExtra("loginType", R.integer.login_type_google);
+            i.putExtra("loginType", getResources().getInteger(R.integer.login_type_google));
             i.putExtra("acct", acct);
             startActivity(i);
             getActivity().finish();
         }
     }
     // End Google //
-
-    // Init Guest //
-    // Login type = 3
-//    private void initGuestInstances(View rootView) {
-//        btnLoginGuest = (TextView) rootView.findViewById(R.id.btnLoginGuest);
-//        btnLoginGuest.setOnClickListener(this);
-//    }
-
-    private void logInGuest() {
-        // TODO: Login Guest, check login status by SharedPreference
-//        Intent i = new Intent(getActivity(), MainActivity.class);
-        Intent i = new Intent(getActivity(), AnimationActivity.class);
-        i.putExtra("loginType", R.integer.login_type_guest);
-        startActivity(i);
-//        getActivity().finish();
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -304,9 +297,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 case R.id.btnLoginGoogle:
                     logInGoogle();
                     break;
-//                case R.id.btnLoginGuest:
-//                    logInGuest();
-//                    break;
             }
         }
     }

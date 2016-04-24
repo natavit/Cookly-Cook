@@ -60,6 +60,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/hint_food_name"
                 android:imeOptions="actionNext"
+                android:inputType="textCapSentences"
                 android:singleLine="true">
 
                 <requestFocus />

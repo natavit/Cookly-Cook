@@ -43,7 +43,7 @@ import java.util.Date;
 import mehdi.sakout.fancybuttons.FancyButton;
 
 /**
- * Created by Natavit on 2/4/2016 AD.
+ * Working with Camera: http://developer.android.com/training/camera/photobasics.html
  */
 public class AddRecipeActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -101,6 +101,9 @@ public class AddRecipeActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
+    /**
+     * Initialize view variables
+     */
     private void initInstances() {
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -122,6 +125,10 @@ public class AddRecipeActivity extends AppCompatActivity implements View.OnClick
         linearLayoutIngredient = (LinearLayout) findViewById(R.id.linearLayoutIngredient);
     }
 
+    /**
+     * Initialize Alert Dialog
+     * Show up when Add Image Button is clicked
+     */
     private void initImageLoader() {
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.select_dialog_item, imgActions);
@@ -216,6 +223,10 @@ public class AddRecipeActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
+    /**
+     * Save a new recipe to the local database (SQLite)
+     * @return boolean to show whether it succeeds or not
+     */
     private boolean saveRecipe() {
 
         String recipeName = etFoodName.getText().toString();
@@ -233,7 +244,8 @@ public class AddRecipeActivity extends AppCompatActivity implements View.OnClick
 
         Cursor cursor = db.rawQuery("SELECT * FROM " + DBCooklyCook.TABLE_RECIPE
                                 + " WHERE " + DBCooklyCook.COL_RECIPE_NAME + "='" + recipeName + "' AND "
-                                + DBCooklyCook.COL_RECIPE_OWNER + "='" + AccountManager.getInstance().getName() + "'", null);
+                                + DBCooklyCook.COL_RECIPE_OWNER + "='" + AccountManager.getInstance().getName()
+                                +  AccountManager.getInstance().getLoginTypeString() + "'", null);
 
 //        Cursor cursor = db.rawQuery("SELECT * FROM " + DBCooklyCook.TABLE_RECIPE
 //                + " WHERE " + DBCooklyCook.COL_RECIPE_NAME + "='" + recipeName + "'", null);
@@ -242,7 +254,8 @@ public class AddRecipeActivity extends AppCompatActivity implements View.OnClick
 
             db.execSQL("INSERT INTO " + DBCooklyCook.TABLE_RECIPE + " ("
                     + DBCooklyCook.COL_RECIPE_NAME + ", " + DBCooklyCook.COL_RECIPE_IMG + ", " + DBCooklyCook.COL_RECIPE_OWNER + ")"
-                    + " VALUES ('" + recipeName + "', '" + imgPath + "', '" + AccountManager.getInstance().getName() + "');");
+                    + " VALUES ('" + recipeName + "', '" + imgPath + "', '" + AccountManager.getInstance().getName()
+                    +  AccountManager.getInstance().getLoginTypeString() + "');");
 
             IngredientViewGroup ing;
             for (int i = 0; i < count; i++) {

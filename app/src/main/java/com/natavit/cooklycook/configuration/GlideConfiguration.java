@@ -13,6 +13,7 @@ import com.bumptech.glide.module.GlideModule;
 public class GlideConfiguration implements GlideModule {
     @Override
     public void applyOptions(Context context, GlideBuilder builder) {
+        // Change Image Decode Format from RGB565 to ARGB8888
         builder.setDecodeFormat(DecodeFormat.PREFER_ARGB_8888);
     }
 

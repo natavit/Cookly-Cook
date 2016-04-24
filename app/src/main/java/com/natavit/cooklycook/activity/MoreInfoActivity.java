@@ -35,6 +35,9 @@ public class MoreInfoActivity extends AppCompatActivity {
         initInstances();
     }
 
+    /**
+     * Initialize view variables
+     */
     private void initInstances() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

@@ -34,22 +34,17 @@ public class FoodListManager {
 
     public void setDao(FoodCollectionDao dao) {
         this.dao = dao;
-        setNextPage(dao.getTo());
-        // Save to Persistent Storage
-        saveCache();
+        if (dao != null) {
+            setNextPage(dao.getTo());
+            // Save to Persistent Storage
+            saveCache();
+        }
     }
 
-    public void insertDaoAtTopPosition(FoodCollectionDao newDao) {
-        if (dao == null)
-            dao = new FoodCollectionDao();
-        if (dao.getHits() == null)
-            dao.setHits(new ArrayList<HitDao>());
-        dao.getHits().addAll(0, newDao.getHits());
-
-        // Save to Persistent Storage
-        saveCache();
-    }
-
+    /**
+     *
+     * @param newDao
+     */
     public void appendDaoAtBottomPosition(FoodCollectionDao newDao) {
         if (dao == null)
             dao = new FoodCollectionDao();

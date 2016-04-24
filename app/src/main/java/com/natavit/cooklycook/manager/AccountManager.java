@@ -52,6 +52,10 @@ public class AccountManager {
         return loginType;
     }
 
+    public String getLoginTypeString() {
+        return loginType == 1 ? "fb" : "gg";
+    }
+
     public void setFoodName(String name) {
         foodName = name;
     }
@@ -68,6 +72,9 @@ public class AccountManager {
         name = n;
     }
 
+    /**
+     * Clear food cache from Shared Preferences
+     */
     public void clearFoodCache() {
         mContext.getSharedPreferences("food",
                 Context.MODE_PRIVATE)
@@ -80,6 +87,10 @@ public class AccountManager {
      *
      * */
 
+    /**
+     * Cache Facebook User's Data
+     * @param object User's Data
+     */
     public void saveCacheGraphRequest(JSONObject object) {
         SharedPreferences prefs = mContext.getSharedPreferences("facebook",
                 Context.MODE_PRIVATE);
@@ -90,6 +101,10 @@ public class AccountManager {
         editor.apply();
     }
 
+    /**
+     * Restore Cached Facebook User's Data if it is available
+     * @return Cached Facebook User's Data
+     */
     public String loadCacheGraphRequest() {
         SharedPreferences prefs = mContext.getSharedPreferences("facebook",
                 Context.MODE_PRIVATE);
@@ -102,6 +117,9 @@ public class AccountManager {
         return json;
     }
 
+    /**
+     * Clear all cached Facebook data within Shared Preferences
+     */
     private void clearCacheGraphRequest() {
         mContext.getSharedPreferences("facebook",
                 Context.MODE_PRIVATE)

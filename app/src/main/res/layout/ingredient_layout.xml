@@ -15,6 +15,7 @@
             android:layout_height="wrap_content"
             android:hint="@string/hint_ing_name"
             android:imeOptions="actionNext"
+            android:inputType="textCapSentences"
             android:singleLine="true"/>
 
     </android.support.design.widget.TextInputLayout>

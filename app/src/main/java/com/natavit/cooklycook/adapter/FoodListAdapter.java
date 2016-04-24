@@ -64,9 +64,6 @@ public class FoodListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
-        // Show Progress Bar
-//        if (getItemViewType(position) == 0) {
         if (position == getCount() - 1) {
             ProgressBar item;
             if (convertView != null) {
@@ -88,12 +85,9 @@ public class FoodListAdapter extends BaseAdapter {
         HitDao dao = (HitDao) getItem(position);
 
         item.setNameText(dao.getRecipe().getLabel());
-//        item.setDescriptionText("position: " + position);
         item.setImageUrl(dao.getRecipe().getImage());
 
         if (position > lastPositionInteger.getValue()) {
-//            Animation anim = AnimationUtils.loadAnimation(parent.getContext(), R.anim.up_from_bottom);
-//            item.startAnimation(anim);
             AnimatorSet set = (AnimatorSet) AnimatorInflater.loadAnimator(parent.getContext(),
                     R.animator.up_from_bottom);
             set.setTarget(item);
@@ -102,21 +96,6 @@ public class FoodListAdapter extends BaseAdapter {
         }
 
         return item;
-
-//        } else {
-//            TextView item;
-//            if (convertView != null) item = (TextView) convertView;
-//            else item = new TextView(parent.getContext());
-//
-//            item.setText("Position: " + position);
-//
-//            return item;
-//        }
     }
-
-    public void increaseLastPosition(int amount) {
-        lastPositionInteger.setValue(lastPositionInteger.getValue() + amount);
-    }
-
 
 }

@@ -3,6 +3,7 @@ package com.natavit.cooklycook.manager;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.natavit.cooklycook.db.DBCooklyCook;
 import com.natavit.cooklycook.model.LocalIngredient;
@@ -34,11 +35,10 @@ public class LocalFoodListManager {
     private LocalFoodListManager() {
         mContext = Contextor.getInstance().getContext();
         recipes = new ArrayList<>();
-
-        loadLocalRecipes();
     }
 
     public ArrayList<LocalRecipe> getLocalRecipes() {
+        loadLocalRecipes();
         return recipes;
     }
 
@@ -49,9 +49,8 @@ public class LocalFoodListManager {
         recipes.clear();
 
         cursor = db.rawQuery("SELECT * FROM " + DBCooklyCook.TABLE_RECIPE
-                + " WHERE " + DBCooklyCook.COL_RECIPE_OWNER + "='" + AccountManager.getInstance().getName() + "'", null);
-
-//        cursor = db.rawQuery("SELECT * FROM " + DBCooklyCook.TABLE_RECIPE, null);
+                + " WHERE " + DBCooklyCook.COL_RECIPE_OWNER + "='" + AccountManager.getInstance().getName()
+                + AccountManager.getInstance().getLoginTypeString() + "'", null);
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -62,6 +61,7 @@ public class LocalFoodListManager {
 
             Cursor cursorIng = db.rawQuery("SELECT * FROM " + DBCooklyCook.TABLE_INGREDIENT
                     + " WHERE " + DBCooklyCook.COL_ING_FOREIGN + "='" + recipeName + "'", null);
+
             cursorIng.moveToFirst();
             ArrayList<LocalIngredient> ings = new ArrayList<>();
             while (!cursorIng.isAfterLast()) {
@@ -87,30 +87,36 @@ public class LocalFoodListManager {
         dbHelper = new DBCooklyCook(mContext);
         db = dbHelper.getReadableDatabase();
 
+        LocalRecipe localRecipe = new LocalRecipe();
+
         Cursor cursor = db.rawQuery("SELECT * FROM " + DBCooklyCook.TABLE_RECIPE
                 + " WHERE " + DBCooklyCook.COL_RECIPE_NAME + "='" + rn + "' AND "
-                + DBCooklyCook.COL_RECIPE_OWNER + "='" + AccountManager.getInstance().getName() + "'", null);
+                + DBCooklyCook.COL_RECIPE_OWNER + "='" + AccountManager.getInstance().getName()
+                + AccountManager.getInstance().getLoginTypeString() + "'", null);
 
-        cursor.moveToFirst();
-        LocalRecipe localRecipe = new LocalRecipe();
-        String recipeName = cursor.getString(cursor.getColumnIndex(DBCooklyCook.COL_RECIPE_NAME));
-        localRecipe.setName(recipeName);
-        localRecipe.setImgPath(cursor.getString(cursor.getColumnIndex(DBCooklyCook.COL_RECIPE_IMG)));
+        if (cursor.moveToFirst()) {
+            String recipeName = cursor.getString(cursor.getColumnIndex(DBCooklyCook.COL_RECIPE_NAME));
+            localRecipe.setName(recipeName);
+            localRecipe.setImgPath(cursor.getString(cursor.getColumnIndex(DBCooklyCook.COL_RECIPE_IMG)));
 
-        Cursor cursorIng = db.rawQuery("SELECT * FROM " + DBCooklyCook.TABLE_INGREDIENT
-                + " WHERE " + DBCooklyCook.COL_ING_FOREIGN + "='" + recipeName + "'", null);
-        cursorIng.moveToFirst();
-        ArrayList<LocalIngredient> ings = new ArrayList<>();
-        while (!cursorIng.isAfterLast()) {
-            LocalIngredient localIngredient = new LocalIngredient();
-            localIngredient.setName(cursorIng.getString(cursorIng.getColumnIndex(DBCooklyCook.COL_ING_NAME)));
-            localIngredient.setAmount(cursorIng.getString(cursorIng.getColumnIndex(DBCooklyCook.COL_ING_AMOUNT)));
-            localIngredient.setFr(cursorIng.getString(cursorIng.getColumnIndex(DBCooklyCook.COL_ING_FOREIGN)));
-            ings.add(localIngredient);
-            cursorIng.moveToNext();
+            Cursor cursorIng = db.rawQuery("SELECT * FROM " + DBCooklyCook.TABLE_INGREDIENT
+                    + " WHERE " + DBCooklyCook.COL_ING_FOREIGN + "='" + recipeName + "'", null);
+            cursorIng.moveToFirst();
+            ArrayList<LocalIngredient> ings = new ArrayList<>();
+            while (!cursorIng.isAfterLast()) {
+                LocalIngredient localIngredient = new LocalIngredient();
+                localIngredient.setName(cursorIng.getString(cursorIng.getColumnIndex(DBCooklyCook.COL_ING_NAME)));
+                localIngredient.setAmount(cursorIng.getString(cursorIng.getColumnIndex(DBCooklyCook.COL_ING_AMOUNT)));
+                localIngredient.setFr(cursorIng.getString(cursorIng.getColumnIndex(DBCooklyCook.COL_ING_FOREIGN)));
+                ings.add(localIngredient);
+                cursorIng.moveToNext();
+            }
+
+            localRecipe.setIngredients(ings);
         }
-
-        localRecipe.setIngredients(ings);
+        else {
+            Log.e("Cursor", "Null");
+        }
 
         dbHelper.close();
         db.close();

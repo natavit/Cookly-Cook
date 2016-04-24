@@ -4,8 +4,6 @@ import android.app.Application;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
-import android.util.Base64;
-import android.util.Log;
 
 import com.facebook.FacebookSdk;
 import com.natavit.cooklycook.manager.Contextor;
@@ -40,7 +38,7 @@ public class MainApplication extends Application {
             for (Signature signature : info.signatures) {
                 MessageDigest md = MessageDigest.getInstance("SHA");
                 md.update(signature.toByteArray());
-                Log.e("App", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+//                Log.e("App", Base64.encodeToString(md.digest(), Base64.DEFAULT));
             }
         } catch (PackageManager.NameNotFoundException e) {
 

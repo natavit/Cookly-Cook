@@ -1,10 +1,12 @@
 package com.natavit.cooklycook.fragment;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -15,22 +17,13 @@ import android.widget.ListView;
 
 import com.natavit.cooklycook.R;
 import com.natavit.cooklycook.activity.AddRecipeActivity;
+import com.natavit.cooklycook.activity.MoreInfoLocalActivity;
 import com.natavit.cooklycook.adapter.LocalFoodListAdapter;
 import com.natavit.cooklycook.datatype.MutableInteger;
 import com.natavit.cooklycook.manager.LocalFoodListManager;
 import com.natavit.cooklycook.model.LocalRecipe;
 
 public class MyRecipeFragment extends Fragment implements View.OnClickListener {
-
-    /**
-     *
-     * Interface
-     *
-     */
-
-    public interface MyRecipeFragmentListener {
-        void onLocalRecipeItemClicked(View view, LocalRecipe recipe);
-    }
 
     /**
      * Variable
@@ -47,7 +40,6 @@ public class MyRecipeFragment extends Fragment implements View.OnClickListener {
 
     FloatingActionButton fab;
 
-    LocalFoodListManager localFoodListManager;
     LocalFoodListAdapter listAdapter;
 
     /**
@@ -82,14 +74,19 @@ public class MyRecipeFragment extends Fragment implements View.OnClickListener {
         return rootView;
     }
 
-    @SuppressWarnings("UnusedParameters")
+    /**
+     * Initialize variable
+     * This method is usually called only once as long as it has not been destroyed by the system.
+     * Goal: To keep states and values of each variable
+     */
     private void init(Bundle savedInstanceState) {
         // Init Fragment level's variable(s) here
-        localFoodListManager = LocalFoodListManager.getInstance();
         lastPositionInteger = new MutableInteger(-1);
     }
 
-    @SuppressWarnings("UnusedParameters")
+    /**
+     * Initialize view variables
+     */
     private void initInstances(View rootView, Bundle savedInstanceState) {
         // Init 'View' instance(s) with rootView.findViewById here
         // Note: State of variable initialized here could not be saved
@@ -101,33 +98,10 @@ public class MyRecipeFragment extends Fragment implements View.OnClickListener {
 
         listView = (ListView) rootView.findViewById(R.id.listView);
         listAdapter = new LocalFoodListAdapter(lastPositionInteger);
-        listAdapter.setRecipe(localFoodListManager.getLocalRecipes());
+        listAdapter.setRecipe(LocalFoodListManager.getInstance().getLocalRecipes());
         listView.setAdapter(listAdapter);
         listView.setOnItemClickListener(listViewItemClickListener);
-
-//        items = new ArrayList<>();
-//        updateRecipeList();
-//
-//        aa = new ArrayAdapter<String>(
-//                getContext(),
-//                android.R.layout.simple_list_item_1,
-//                items);
-//
-//        listView.setAdapter(aa);
     }
-
-//    private void updateRecipeList() {
-//        items.clear();
-//        dbHelper = new DBCooklyCook(getContext());
-//        db = dbHelper.getReadableDatabase();
-//
-//        cursor = db.rawQuery("SELECT * FROM " + DBCooklyCook.TABLE_RECIPE, null);
-//        cursor.moveToFirst();
-//        while (!cursor.isAfterLast()) {
-//            items.add(cursor.getString(cursor.getColumnIndex(DBCooklyCook.COL_RECIPE_NAME)));
-//            cursor.moveToNext();
-//        }
-//    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -136,7 +110,7 @@ public class MyRecipeFragment extends Fragment implements View.OnClickListener {
         switch (requestCode) {
             case REQUEST_ADD_RECIPE_CODE: {
                 if (resultCode == AppCompatActivity.RESULT_OK) {
-                    localFoodListManager.loadLocalRecipes();
+                    LocalFoodListManager.getInstance().loadLocalRecipes();
                     listAdapter.notifyDataSetChanged();
                 }
                 break;
@@ -148,6 +122,9 @@ public class MyRecipeFragment extends Fragment implements View.OnClickListener {
                     }
                 }
             }
+            default:
+                listAdapter.notifyDataSetChanged();
+                break;
         }
 
     }
@@ -181,13 +158,30 @@ public class MyRecipeFragment extends Fragment implements View.OnClickListener {
      *
      */
 
+    /**
+     * Listen to any click event on each item
+     */
     AdapterView.OnItemClickListener listViewItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            if (position < localFoodListManager.getCount()) {
-                LocalRecipe recipe = localFoodListManager.getLocalRecipes().get(position);
-                MyRecipeFragmentListener listener = (MyRecipeFragmentListener) getActivity();
-                listener.onLocalRecipeItemClicked(view, recipe);
+            if (position < LocalFoodListManager.getInstance().getCount()) {
+                LocalRecipe recipe = LocalFoodListManager.getInstance().getLocalRecipes().get(position);
+
+//                MyRecipeFragmentListener listener = (MyRecipeFragmentListener) getActivity();
+//                listener.onLocalRecipeItemClicked(view, recipe);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    Intent intent = new Intent(getActivity(), MoreInfoLocalActivity.class);
+                    intent.putExtra("recipe", recipe);
+                    ActivityOptionsCompat options = ActivityOptionsCompat.
+                            makeSceneTransitionAnimation(getActivity(), view.findViewById(R.id.ivImg), "ivFood");
+                    startActivityForResult(intent, REQUEST_MORE_INFO_CODE, options.toBundle());
+                }
+                else {
+                    Intent intent = new Intent(getActivity(), MoreInfoLocalActivity.class);
+                    intent.putExtra("recipe", recipe);
+                    startActivity(intent);
+                }
             }
         }
     };

@@ -37,9 +37,7 @@ import com.natavit.cooklycook.R;
 import com.natavit.cooklycook.adapter.PagerAdapter;
 import com.natavit.cooklycook.dao.HitDao;
 import com.natavit.cooklycook.fragment.MainFragment;
-import com.natavit.cooklycook.fragment.MyRecipeFragment;
 import com.natavit.cooklycook.manager.AccountManager;
-import com.natavit.cooklycook.model.LocalRecipe;
 import com.natavit.cooklycook.util.Utils;
 
 import org.json.JSONException;
@@ -52,13 +50,15 @@ import mehdi.sakout.fancybuttons.FancyButton;
  * Created by Natavit on 2/4/2016 AD.
  */
 public class MainActivity extends AppCompatActivity
-        implements MainFragment.MainFragmentListener, MyRecipeFragment.MyRecipeFragmentListener, View.OnClickListener {
+        implements MainFragment.MainFragmentListener, View.OnClickListener {
 
     /**
      *
      * Variable
      *
      */
+
+    public static final int REQUEST_SETTING_CODE = 33333;
 
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle actionBarDrawerToggle;
@@ -75,8 +75,6 @@ public class MainActivity extends AppCompatActivity
     FancyButton btnLogout;
     TextView tvProfileName;
     TextView tvProfileEmail;
-
-    AccountManager accountManager;
 
     String foodName;
 
@@ -108,28 +106,32 @@ public class MainActivity extends AppCompatActivity
             Utils.getInstance().showSnackBarLong("Offline Mode", coordinatorLayout);
 
         if (savedInstanceState == null) {
-
-            if (accountManager.getLoginType() == R.integer.login_type_google) {
+            if (AccountManager.getInstance().getLoginType() == getResources().getInteger(R.integer.login_type_google)) {
                 initGoogleInstances();
             }
-            else if (accountManager.getLoginType() == R.integer.login_type_facebook) {
+            else if (AccountManager.getInstance().getLoginType() == getResources().getInteger(R.integer.login_type_facebook)) {
                 initFacebookInstances();
             }
-
-//            getSupportFragmentManager().beginTransaction()
-//                    .add(R.id.contentContainer, MainFragment.newInstance(accountManager.getLoginType()), "MainFragment")
-//                    .commit();
         }
 
     }
 
+    /**
+     * Initialize variables
+     */
     private void initInstances() {
+
+        foodName = PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+                .getString(getString(R.string.pref_food_key), getString(R.string.pref_food_default));
+
+        AccountManager.getInstance().setFoodName(foodName);
+        AccountManager.getInstance().setLoginType(
+                getIntent().getIntExtra("loginType", getResources().getInteger(R.integer.login_type_facebook)));
+
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        setupTabs();
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         actionBarDrawerToggle = new ActionBarDrawerToggle(
@@ -144,15 +146,12 @@ public class MainActivity extends AppCompatActivity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         setupNavigationView();
-
-        foodName = PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
-                .getString(getString(R.string.pref_food_key), getString(R.string.pref_food_default));
-
-        accountManager = AccountManager.getInstance();
-        accountManager.setFoodName(foodName);
-        accountManager.setLoginType(getIntent().getIntExtra("loginType", R.integer.login_type_guest));
+        setupTabs();
     }
 
+    /**
+     * Initialize Tab View: Recipes and My Recipes
+     */
     private void setupTabs() {
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         tabLayout.addTab(tabLayout.newTab().setText("Recipes"));
@@ -181,6 +180,9 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
+    /**
+     * Initialize Navigation Drawer and its components
+     */
     private void setupNavigationView() {
         navigationView = (NavigationView) findViewById(R.id.navigationView);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -189,7 +191,7 @@ public class MainActivity extends AppCompatActivity
                 switch (item.getItemId()) {
                     case R.id.navSetting: {
 //                        item.setChecked(true);
-                        startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+                        startActivityForResult(new Intent(MainActivity.this, SettingsActivity.class), REQUEST_SETTING_CODE);
                         drawerLayout.closeDrawers();
                         return true;
                     }
@@ -215,7 +217,7 @@ public class MainActivity extends AppCompatActivity
 
     private void initFacebookInstances() {
 
-        String json = accountManager.loadCacheGraphRequest();
+        String json = AccountManager.getInstance().loadCacheGraphRequest();
         if (json == null) {
             graphRequest();
         }
@@ -227,7 +229,7 @@ public class MainActivity extends AppCompatActivity
                 tvProfileName.setText(object.getString("name"));
                 tvProfileEmail.setText(object.getString("email"));
                 setProfileHeaderImage(Profile.getCurrentProfile().getProfilePictureUri(300, 300));
-                accountManager.setName(object.getString("name"));
+                AccountManager.getInstance().setName(object.getString("name"));
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -238,6 +240,9 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    /**
+     * Make a request to fetch a user's information from Facebook
+     */
     private void graphRequest() {
         GraphRequest request = GraphRequest.newMeRequest(
                 AccessToken.getCurrentAccessToken(),
@@ -248,20 +253,18 @@ public class MainActivity extends AppCompatActivity
                             GraphResponse response) {
                         // Application code
                         try {
-//                            tvName.setText(getString(R.string.signed_in_fmt, object.getString("name")));
-//                            tvEmail.setText(getString(R.string.email_in_fmt, object.getString("email")));
                             tvProfileName.setText(object.getString("name"));
                             tvProfileEmail.setText(object.getString("email"));
                             setProfileHeaderImage(Profile.getCurrentProfile().getProfilePictureUri(300, 300));
 
                             // Cache user's information
-                            accountManager.saveCacheGraphRequest(object);
-                            accountManager.setName(object.getString("name"));
+                            AccountManager.getInstance().saveCacheGraphRequest(object);
+                            AccountManager.getInstance().setName(object.getString("name"));
 
                         } catch (NullPointerException e) {
                             if (Utils.getInstance().isOnline()) {
                                 Utils.getInstance().showToast("Session Expired");
-                                accountManager.logOutFacebook();
+                                AccountManager.getInstance().logOutFacebook();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -286,12 +289,11 @@ public class MainActivity extends AppCompatActivity
 
         GoogleSignInAccount acct = getIntent().getParcelableExtra("acct");
 
-        accountManager.setupGoogleApiClient(MainActivity.this);
+        AccountManager.getInstance().setupGoogleApiClient(MainActivity.this);
 
-//        tvName.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
         tvProfileName.setText(acct.getDisplayName());
         tvProfileEmail.setText(acct.getEmail());
-        accountManager.setName(acct.getDisplayName());
+        AccountManager.getInstance().setName(acct.getDisplayName());
 
         setProfileHeaderImage(acct.getPhotoUrl());
 
@@ -300,9 +302,14 @@ public class MainActivity extends AppCompatActivity
 
     // End Google //
 
+    /**
+     * Set up Profile image located on the Navigation Drawer
+     * @param uri of an image
+     */
     private void setProfileHeaderImage(Uri uri) {
         Glide.with(MainActivity.this)
                 .load(uri)
+                .placeholder(R.drawable.profile)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .bitmapTransform(new CropCircleTransformation(MainActivity.this))
 //                .error() put image when unsuccessful downloading occurs
@@ -317,23 +324,11 @@ public class MainActivity extends AppCompatActivity
         // Logs 'install' and 'app activate' App Events.
         AppEventsLogger.activateApp(this);
 
-        String fn = PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+        String fn = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString(getString(R.string.pref_food_key), getString(R.string.pref_food_default));
-
-        if (!accountManager.getFoodName().toUpperCase().equals(fn.toUpperCase())) {
-            Utils.getInstance().showSnackBarShort("Loading new recipes...", coordinatorLayout);
-            accountManager.setFoodName(fn);
-            accountManager.clearFoodCache();
-
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.contentContainer,
-                    MainFragment.newInstance(),
-                    "MainFragment")
-                    .commit();
-
-        }
-        else {
-//            Utils.getInstance().showSnackBarShort(accountManager.getFoodName() + " " + foodName, coordinatorLayout);
+        if (!AccountManager.getInstance().getFoodName().toUpperCase().equals(fn.toUpperCase())) {
+            AccountManager.getInstance().setFoodName(fn);
+            AccountManager.getInstance().clearFoodCache();
         }
     }
 
@@ -377,6 +372,11 @@ public class MainActivity extends AppCompatActivity
         actionBarDrawerToggle.onConfigurationChanged(newConfig);
     }
 
+    /**
+     * To listen to any click on item then create a new activity, MoreInfoActivity, to show more information
+     * @param view to make a shared element animation
+     * @param dao a selected recipe sent to a new activity
+     */
     @Override
     public void onRecipeItemClicked(View view, HitDao dao) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -394,30 +394,16 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onLocalRecipeItemClicked(View view, LocalRecipe recipe) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Intent intent = new Intent(this, MoreInfoLocalActivity.class);
-            intent.putExtra("recipe", recipe);
-            ActivityOptionsCompat options = ActivityOptionsCompat.
-                    makeSceneTransitionAnimation(this, view.findViewById(R.id.ivImg), "ivFood");
-            startActivityForResult(intent, MyRecipeFragment.REQUEST_MORE_INFO_CODE, options.toBundle());
-        }
-        else {
-            Intent intent = new Intent(this, MoreInfoLocalActivity.class);
-            intent.putExtra("recipe", recipe);
-            startActivity(intent);
-        }
-    }
-
-    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btnLogOut: {
-                if (accountManager.getLoginType() == R.integer.login_type_facebook) {
-                    accountManager.logOutFacebook();
+                if (AccountManager.getInstance().getLoginType()
+                        == getResources().getInteger(R.integer.login_type_facebook)) {
+                    AccountManager.getInstance().logOutFacebook();
                 }
-                else if (accountManager.getLoginType() == R.integer.login_type_google) {
-                    accountManager.logOutGoogle();
+                else if (AccountManager.getInstance().getLoginType()
+                        == getResources().getInteger(R.integer.login_type_google)) {
+                    AccountManager.getInstance().logOutGoogle();
                 }
 
                 PreferenceManager.getDefaultSharedPreferences(MainActivity.this)

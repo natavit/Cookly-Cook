@@ -44,6 +44,9 @@ public class MoreInfoLocalActivity extends AppCompatActivity implements View.OnC
         initInstances();
     }
 
+    /**
+     * Initialize view variables
+     */
     private void initInstances() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -93,24 +96,31 @@ public class MoreInfoLocalActivity extends AppCompatActivity implements View.OnC
         }
     }
 
+    /**
+     * This method will be called when there is any update on a selected local recipe
+     * @param data an Edited data
+     */
     private void loadUpdatedRecipe(Intent data) {
         LocalRecipe lr = data.getExtras().getParcelable("newRecipe");
-
         if (lr == null) return;
+        else if (lr.getIngredients() == null) return;
+        else {
+            collapsingToolbarLayout.setTitle(lr.getName());
 
-        collapsingToolbarLayout.setTitle(lr.getName());
+            String ingredient = "";
+            for (LocalIngredient ing : lr.getIngredients()) {
+                ingredient += ing.getAmount() + " " + ing.getName() + "\n";
+            }
+            tvFoodName.setText(ingredient);
 
-        String ingredient = "";
-        for (LocalIngredient ing : lr.getIngredients()) {
-            ingredient += ing.getAmount() + " " + ing.getName() + "\n";
+            Glide.with(MoreInfoLocalActivity.this)
+                    .load(lr.getImgPath())
+                    .placeholder(R.drawable.loading)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(imageViewHeader);
+
+            recipe = lr;
         }
-        tvFoodName.setText(ingredient);
-
-        Glide.with(MoreInfoLocalActivity.this)
-                .load(lr.getImgPath())
-                .placeholder(R.drawable.loading)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(imageViewHeader);
     }
 
     @Override

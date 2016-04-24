@@ -44,7 +44,7 @@ import java.util.Date;
 import mehdi.sakout.fancybuttons.FancyButton;
 
 /**
- * Created by Natavit on 2/4/2016 AD.
+ * Working with Camera: http://developer.android.com/training/camera/photobasics.html
  */
 public class EditRecipeActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -101,6 +101,9 @@ public class EditRecipeActivity extends AppCompatActivity implements View.OnClic
         }
     }
 
+    /**
+     * Initialize view variables
+     */
     private void initInstances() {
         recipe = getIntent().getParcelableExtra("recipe");
 
@@ -121,8 +124,12 @@ public class EditRecipeActivity extends AppCompatActivity implements View.OnClic
         restoreRecipe();
     }
 
+    /**
+     * Load a recipe data from the local database (SQLite)
+     */
     private void restoreRecipe() {
         etFoodName.setText(recipe.getName());
+        etFoodName.setSelection(etFoodName.getText().length());
 
         if (recipe.getImgPath() != null) {
             btnAddImgRecipe.setVisibility(View.GONE);
@@ -144,9 +151,13 @@ public class EditRecipeActivity extends AppCompatActivity implements View.OnClic
         }
     }
 
+    /**
+     * Initialize Alert Dialog
+     * Show up when Add Image Button is clicked
+     */
     private void initImageLoader() {
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.select_dialog_item, imgActions);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.select_dialog_item, imgActions);
         builder = new AlertDialog.Builder(this);
         builder.setTitle("Select Image");
         builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
@@ -247,70 +258,77 @@ public class EditRecipeActivity extends AppCompatActivity implements View.OnClic
         }
     }
 
+    /**
+     * Edit a selected recipe and save to the local database (SQLite)
+     * @return boolean to show whether it succeeds or not
+     */
     private boolean updateRecipe() {
 
-        String recipeName = etFoodName.getText().toString();
+        String rn = etFoodName.getText().toString();
 
-        if (recipeName.equals("") || recipeName.equals(" ")) {
+        if (rn.equals("") || rn.equals(" ")) {
             return false;
         }
+        else {
 
-        String imgPath = mCurrentPhotoPath != null ? mCurrentPhotoPath : recipe.getImgPath();
+            String imgPath = mCurrentPhotoPath != null ? mCurrentPhotoPath : recipe.getImgPath();
+            Log.e("IMG", imgPath);
 
-        dbHelper = new DBCooklyCook(this);
-        db = dbHelper.getWritableDatabase();
+            dbHelper = new DBCooklyCook(this);
+            db = dbHelper.getWritableDatabase();
 
-        int count = linearLayoutIngredient.getChildCount();
+            int count = linearLayoutIngredient.getChildCount();
 
-        db.execSQL("UPDATE " + DBCooklyCook.TABLE_RECIPE + " SET "
-                + DBCooklyCook.COL_RECIPE_NAME + "='" + recipeName + "', "
-                + DBCooklyCook.COL_RECIPE_IMG + "='" + imgPath + "', "
-                + DBCooklyCook.COL_RECIPE_OWNER + "='" + AccountManager.getInstance().getName() + "'"
-                + " WHERE " + DBCooklyCook.COL_RECIPE_NAME + "='" + recipe.getName() + "'"
-                + " AND " + DBCooklyCook.COL_RECIPE_IMG + "='" + recipe.getImgPath() + "'"
-                + " AND " + DBCooklyCook.COL_RECIPE_OWNER + "='" + AccountManager.getInstance().getName() + "';");
+            db.execSQL("UPDATE " + DBCooklyCook.TABLE_RECIPE + " SET "
+                    + DBCooklyCook.COL_RECIPE_NAME + "='" + rn + "', "
+                    + DBCooklyCook.COL_RECIPE_IMG + "='" + imgPath + "', "
+                    + DBCooklyCook.COL_RECIPE_OWNER + "='" + AccountManager.getInstance().getName()
+                    + AccountManager.getInstance().getLoginTypeString() + "'"
+                    + " WHERE " + DBCooklyCook.COL_RECIPE_NAME + "='" + recipe.getName() + "'"
+                    + " AND " + DBCooklyCook.COL_RECIPE_IMG + "='" + recipe.getImgPath() + "'"
+                    + " AND " + DBCooklyCook.COL_RECIPE_OWNER + "='" + AccountManager.getInstance().getName()
+                    + AccountManager.getInstance().getLoginTypeString() + "';");
 
-        db.execSQL("DELETE FROM " + DBCooklyCook.TABLE_INGREDIENT
-                + " WHERE " + DBCooklyCook.COL_ING_FOREIGN + "='" + recipe.getName() + "';");
+            db.execSQL("DELETE FROM " + DBCooklyCook.TABLE_INGREDIENT
+                    + " WHERE " + DBCooklyCook.COL_ING_FOREIGN + "='" + recipe.getName() + "';");
 
-        IngredientViewGroup ing;
-        for (int i = 0; i < count; i++) {
-            ing = (IngredientViewGroup) linearLayoutIngredient.getChildAt(i);
-            if (ing != null) {
-                String ingredientName = ing.getIngredientName();
-                String ingredientAmount = ing.getIngredientAmount();
-                if (!ingredientName.equals("") && !ingredientName.equals(" ")
-                        && !ingredientAmount.equals("") && !ingredientAmount.equals(" ")) {
-//                    db.execSQL("UPDATE " + DBCooklyCook.TABLE_INGREDIENT + " SET "
-//                    + DBCooklyCook.COL_ING_NAME + "='" + ingredientName + "', "
-//                    + DBCooklyCook.COL_ING_AMOUNT + "='" + ingredientAmount + "', "
-//                    + DBCooklyCook.COL_ING_FOREIGN + "='" + recipeName + "'"
-//                    + " WHERE " + DBCooklyCook.COL_ING_NAME + "='" + recipe.getIngredients().get(i).getName() + "'"
-//                    + " AND " + DBCooklyCook.COL_ING_FOREIGN + "='" + recipe.getName() + "';");
-                    db.execSQL("INSERT INTO " + DBCooklyCook.TABLE_INGREDIENT + " ("
-                            + DBCooklyCook.COL_ING_NAME + ", " + DBCooklyCook.COL_ING_AMOUNT + ", " + DBCooklyCook.COL_ING_FOREIGN + ")"
-                            + " VALUES ('" + ingredientName + "', '" + ingredientAmount + "', '" + recipeName + "');");
+            IngredientViewGroup ing;
+            for (int i = 0; i < count; i++) {
+                ing = (IngredientViewGroup) linearLayoutIngredient.getChildAt(i);
+                if (ing != null) {
+                    String ingredientName = ing.getIngredientName();
+                    String ingredientAmount = ing.getIngredientAmount();
+                    if (!ingredientName.equals("") && !ingredientName.equals(" ")
+                            && !ingredientAmount.equals("") && !ingredientAmount.equals(" ")) {
+                        db.execSQL("INSERT INTO " + DBCooklyCook.TABLE_INGREDIENT + " ("
+                                + DBCooklyCook.COL_ING_NAME + ", " + DBCooklyCook.COL_ING_AMOUNT + ", " + DBCooklyCook.COL_ING_FOREIGN + ")"
+                                + " VALUES ('" + ingredientName + "', '" + ingredientAmount + "', '" + rn + "');");
+                    }
                 }
             }
+
+            dbHelper.close();
+            db.close();
+
+            LocalFoodListManager.getInstance().loadLocalRecipes();
+            this.recipeName = rn;
+
+            return true;
         }
-
-        dbHelper.close();
-        db.close();
-
-        LocalFoodListManager.getInstance().loadLocalRecipes();
-        this.recipeName = recipeName;
-
-        return true;
     }
 
 
+    /**
+     * Delete a selected recipe from the local database (SQLite)
+     */
     private void deleteRecipe() {
         dbHelper = new DBCooklyCook(this);
         db = dbHelper.getWritableDatabase();
 
         db.execSQL("DELETE FROM " + DBCooklyCook.TABLE_RECIPE
                 + " WHERE " + DBCooklyCook.COL_RECIPE_NAME + "='" + recipe.getName() + "'"
-                + " AND " + DBCooklyCook.COL_RECIPE_OWNER + "='" + AccountManager.getInstance().getName() + "';");
+                + " AND " + DBCooklyCook.COL_RECIPE_OWNER + "='" + AccountManager.getInstance().getName()
+                + AccountManager.getInstance().getLoginTypeString() + "';");
 
         db.execSQL("DELETE FROM " + DBCooklyCook.TABLE_INGREDIENT
                 + " WHERE " + DBCooklyCook.COL_ING_FOREIGN + "='" + recipe.getName() + "';");
@@ -448,5 +466,6 @@ public class EditRecipeActivity extends AppCompatActivity implements View.OnClic
         btnAddImgRecipe.setVisibility(View.INVISIBLE);
 //        mCurrentPhotoPath = null;
     }
+
 
 }

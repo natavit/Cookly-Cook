@@ -5,13 +5,14 @@
 
         <EditTextPreference
             android:defaultValue="@string/pref_food_default"
-            android:inputType="text"
+            android:inputType="textCapSentences"
             android:key="@string/pref_food_key"
             android:singleLine="true"
             android:summary="Hamburger"
             android:title="@string/pref_food_label" />
 
         <EditTextPreference
+            android:inputType="textCapSentences"
             android:selectable="false"
             android:singleLine="true"
             android:summary="1.0beta"
