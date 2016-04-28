@@ -1,1 +1,1 @@
-include ':app', ':TemplateLibrary'
+include ':app'

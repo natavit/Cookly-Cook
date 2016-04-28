@@ -16,8 +16,6 @@ public class LoginActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-//        initInstance();
-
         /**
          * To check an instance state
          * OR This condition will be true if and only if

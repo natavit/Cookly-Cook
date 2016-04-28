@@ -145,8 +145,9 @@ public class EditRecipeActivity extends AppCompatActivity implements View.OnClic
             IngredientViewGroup ingredientViewGroup = new IngredientViewGroup(EditRecipeActivity.this);
             ingredientViewGroup.setLayoutParams(
                     new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            ingredientViewGroup.setEtIngName(recipe.getIngredients().get(i).getName());
-            ingredientViewGroup.setEtIngAmount(recipe.getIngredients().get(i).getAmount());
+            ingredientViewGroup.setIngredientName(recipe.getIngredients().get(i).getName());
+            ingredientViewGroup.setIngredientAmount(recipe.getIngredients().get(i).getAmount());
+            ingredientViewGroup.setIngredientUnit(recipe.getIngredients().get(i).getUnit());
             linearLayoutIngredient.addView(ingredientViewGroup);
         }
     }
@@ -174,88 +175,6 @@ public class EditRecipeActivity extends AppCompatActivity implements View.OnClic
         });
 
         dialog = builder.create();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case IMAGE_FROM_CAMERA: {
-                if (resultCode == RESULT_OK) {
-                    handleBigCameraPhoto();
-
-                    btnAddImgRecipe.setVisibility(View.INVISIBLE);
-                }
-                else {
-                    new File(mCurrentPhotoPath).delete();
-                }
-                break;
-            }
-            case IMAGE_FROM_GALLERY: {
-                if (resultCode == RESULT_OK) {
-                    handleGalleryPhoto(data);
-                }
-            }
-        }
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_edit_recipe, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home: {
-                finish();
-                return true;
-            }
-            case R.id.action_save: {
-                if(updateRecipe()) {
-                    Bundle bundle = new Bundle();
-                    bundle.putParcelable("newRecipe", LocalFoodListManager.getInstance().getSingleLocalRecipe(recipeName));
-                    Intent result = new Intent();
-                    result.putExtras(bundle);
-                    setResult(RESULT_OK, result);
-                    finish();
-                }
-                else {
-                    Toast.makeText(this, "Food name cannot be blank", Toast.LENGTH_SHORT).show();
-                }
-                return true;
-            }
-            case R.id.action_delete: {
-                deleteRecipe();
-                Bundle bundle = new Bundle();
-                bundle.putParcelable("newRecipe", null);
-                Intent result = new Intent();
-                result.putExtras(bundle);
-                setResult(RESULT_OK, result);
-                finish();
-                return true;
-            }
-            default:
-                return false;
-        }
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.ivAddIngredient: {
-                IngredientViewGroup ingredientViewGroup = new IngredientViewGroup(EditRecipeActivity.this);
-                ingredientViewGroup.setLayoutParams(
-                        new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                linearLayoutIngredient.addView(ingredientViewGroup);
-                break;
-            }
-            case R.id.ivImgRecipe: {
-                dialog.show();
-            }
-        }
     }
 
     /**
@@ -298,11 +217,19 @@ public class EditRecipeActivity extends AppCompatActivity implements View.OnClic
                 if (ing != null) {
                     String ingredientName = ing.getIngredientName();
                     String ingredientAmount = ing.getIngredientAmount();
+                    String ingredientUnit = ing.getIngredientUnit();
                     if (!ingredientName.equals("") && !ingredientName.equals(" ")
-                            && !ingredientAmount.equals("") && !ingredientAmount.equals(" ")) {
+                            && !ingredientAmount.equals("") && !ingredientAmount.equals(" ")
+                            && !ingredientUnit.equals("") && !ingredientUnit.equals(" ")) {
                         db.execSQL("INSERT INTO " + DBCooklyCook.TABLE_INGREDIENT + " ("
-                                + DBCooklyCook.COL_ING_NAME + ", " + DBCooklyCook.COL_ING_AMOUNT + ", " + DBCooklyCook.COL_ING_FOREIGN + ")"
-                                + " VALUES ('" + ingredientName + "', '" + ingredientAmount + "', '" + rn + "');");
+                                + DBCooklyCook.COL_ING_NAME + ", "
+                                + DBCooklyCook.COL_ING_AMOUNT + ", "
+                                + DBCooklyCook.COL_ING_UNIT + ", "
+                                + DBCooklyCook.COL_ING_FOREIGN + ")"
+                                + " VALUES ('" + ingredientName + "', '"
+                                + ingredientAmount + "', '"
+                                + ingredientUnit + "', '"
+                                + rn + "');");
                     }
                 }
             }
@@ -340,8 +267,12 @@ public class EditRecipeActivity extends AppCompatActivity implements View.OnClic
     }
 
     /**
+     *
      * Image Management
      * Capture/Load
+     *
+     * Working with Camera: http://developer.android.com/training/camera/photobasics.html
+     *
      */
 
     /* Photo album for this application */
@@ -465,6 +396,88 @@ public class EditRecipeActivity extends AppCompatActivity implements View.OnClic
 
         btnAddImgRecipe.setVisibility(View.INVISIBLE);
 //        mCurrentPhotoPath = null;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case IMAGE_FROM_CAMERA: {
+                if (resultCode == RESULT_OK) {
+                    handleBigCameraPhoto();
+
+                    btnAddImgRecipe.setVisibility(View.INVISIBLE);
+                }
+                else {
+                    new File(mCurrentPhotoPath).delete();
+                }
+                break;
+            }
+            case IMAGE_FROM_GALLERY: {
+                if (resultCode == RESULT_OK) {
+                    handleGalleryPhoto(data);
+                }
+            }
+        }
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_edit_recipe, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home: {
+                finish();
+                return true;
+            }
+            case R.id.action_save: {
+                if(updateRecipe()) {
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable("newRecipe", LocalFoodListManager.getInstance().getSingleLocalRecipe(recipeName));
+                    Intent result = new Intent();
+                    result.putExtras(bundle);
+                    setResult(RESULT_OK, result);
+                    finish();
+                }
+                else {
+                    Toast.makeText(this, "Food name cannot be blank", Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            }
+            case R.id.action_delete: {
+                deleteRecipe();
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("newRecipe", null);
+                Intent result = new Intent();
+                result.putExtras(bundle);
+                setResult(RESULT_OK, result);
+                finish();
+                return true;
+            }
+            default:
+                return false;
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.ivAddIngredient: {
+                IngredientViewGroup ingredientViewGroup = new IngredientViewGroup(EditRecipeActivity.this);
+                ingredientViewGroup.setLayoutParams(
+                        new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                linearLayoutIngredient.addView(ingredientViewGroup);
+                break;
+            }
+            case R.id.ivImgRecipe: {
+                dialog.show();
+            }
+        }
     }
 
 

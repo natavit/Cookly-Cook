@@ -68,6 +68,7 @@ public class LocalFoodListManager {
                 LocalIngredient localIngredient = new LocalIngredient();
                 localIngredient.setName(cursorIng.getString(cursorIng.getColumnIndex(DBCooklyCook.COL_ING_NAME)));
                 localIngredient.setAmount(cursorIng.getString(cursorIng.getColumnIndex(DBCooklyCook.COL_ING_AMOUNT)));
+                localIngredient.setUnit(cursorIng.getString(cursorIng.getColumnIndex(DBCooklyCook.COL_ING_UNIT)));
                 localIngredient.setFr(cursorIng.getString(cursorIng.getColumnIndex(DBCooklyCook.COL_ING_FOREIGN)));
                 ings.add(localIngredient);
                 cursorIng.moveToNext();
@@ -107,6 +108,7 @@ public class LocalFoodListManager {
                 LocalIngredient localIngredient = new LocalIngredient();
                 localIngredient.setName(cursorIng.getString(cursorIng.getColumnIndex(DBCooklyCook.COL_ING_NAME)));
                 localIngredient.setAmount(cursorIng.getString(cursorIng.getColumnIndex(DBCooklyCook.COL_ING_AMOUNT)));
+                localIngredient.setUnit(cursorIng.getString(cursorIng.getColumnIndex(DBCooklyCook.COL_ING_UNIT)));
                 localIngredient.setFr(cursorIng.getString(cursorIng.getColumnIndex(DBCooklyCook.COL_ING_FOREIGN)));
                 ings.add(localIngredient);
                 cursorIng.moveToNext();

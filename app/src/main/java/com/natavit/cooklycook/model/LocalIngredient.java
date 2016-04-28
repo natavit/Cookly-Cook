@@ -10,6 +10,7 @@ public class LocalIngredient implements Parcelable {
     private String name;
     private String amount;
     private String fr;
+    private String unit;
 
     public LocalIngredient() {
 
@@ -19,6 +20,7 @@ public class LocalIngredient implements Parcelable {
         name = in.readString();
         amount = in.readString();
         fr = in.readString();
+        unit = in.readString();
     }
 
     public static final Creator<LocalIngredient> CREATOR = new Creator<LocalIngredient>() {
@@ -57,6 +59,14 @@ public class LocalIngredient implements Parcelable {
         this.fr = fr;
     }
 
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -67,5 +77,6 @@ public class LocalIngredient implements Parcelable {
         dest.writeString(name);
         dest.writeString(amount);
         dest.writeString(fr);
+        dest.writeString(unit);
     }
 }

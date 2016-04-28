@@ -16,25 +16,31 @@
             android:hint="@string/hint_ing_name"
             android:imeOptions="actionNext"
             android:inputType="textCapSentences"
-            android:singleLine="true"/>
+            android:singleLine="true" />
 
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:layout_marginLeft="16dp">
+        android:layout_weight="1">
 
         <EditText
             android:id="@+id/etIngAmount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
             android:hint="@string/hint_ing_amount"
-            android:inputType="numberDecimal"
             android:imeOptions="actionDone"
-            android:singleLine="true"/>
+            android:inputType="numberDecimal"
+            android:singleLine="true" />
 
     </android.support.design.widget.TextInputLayout>
+
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
 
 </LinearLayout>

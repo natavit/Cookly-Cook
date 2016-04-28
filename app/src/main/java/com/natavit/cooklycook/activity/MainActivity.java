@@ -214,7 +214,6 @@ public class MainActivity extends AppCompatActivity
      * Initialize Facebook Variables
      *
      */
-
     private void initFacebookInstances() {
 
         String json = AccountManager.getInstance().loadCacheGraphRequest();
@@ -235,8 +234,6 @@ public class MainActivity extends AppCompatActivity
                 e.printStackTrace();
             }
         }
-
-//        tvName.setText(getString(R.string.signed_in_fmt, Profile.getCurrentProfile().getName()));
 
     }
 
@@ -303,7 +300,7 @@ public class MainActivity extends AppCompatActivity
     // End Google //
 
     /**
-     * Set up Profile image located on the Navigation Drawer
+     * Set up Profile image on the Navigation Drawer
      * @param uri of an image
      */
     private void setProfileHeaderImage(Uri uri) {
@@ -322,7 +319,7 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
 
         // Logs 'install' and 'app activate' App Events.
-        AppEventsLogger.activateApp(this);
+        AppEventsLogger.activateApp(getApplication());
 
         String fn = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString(getString(R.string.pref_food_key), getString(R.string.pref_food_default));
@@ -330,14 +327,6 @@ public class MainActivity extends AppCompatActivity
             AccountManager.getInstance().setFoodName(fn);
             AccountManager.getInstance().clearFoodCache();
         }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        // Logs 'app deactivate' App Event.
-        AppEventsLogger.deactivateApp(this);
     }
 
     @Override

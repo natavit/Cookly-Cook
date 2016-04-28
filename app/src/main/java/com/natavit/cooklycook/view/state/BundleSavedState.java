@@ -1,4 +1,4 @@
-package com.inthecheesefactory.thecheeselibrary.view.state;
+package com.natavit.cooklycook.view.state;
 
 import android.os.Bundle;
 import android.os.Parcel;

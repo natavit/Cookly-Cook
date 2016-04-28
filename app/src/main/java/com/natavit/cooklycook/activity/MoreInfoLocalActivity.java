@@ -66,7 +66,7 @@ public class MoreInfoLocalActivity extends AppCompatActivity implements View.OnC
         tvFoodName = (TextView) findViewById(R.id.tvFoodName);
         String ingredient = "";
         for (LocalIngredient ing : recipe.getIngredients()) {
-            ingredient += ing.getName() + ": " + ing.getAmount() + "\n";
+            ingredient += ing.getName() + " - " + ing.getAmount() + " " + ing.getUnit() + "\n";
         }
         tvFoodName.setText(ingredient);
 
@@ -109,7 +109,7 @@ public class MoreInfoLocalActivity extends AppCompatActivity implements View.OnC
 
             String ingredient = "";
             for (LocalIngredient ing : lr.getIngredients()) {
-                ingredient += ing.getAmount() + " " + ing.getName() + "\n";
+                ingredient += ing.getName() + " - " + ing.getAmount() + " " + ing.getUnit() + "\n";
             }
             tvFoodName.setText(ingredient);
 

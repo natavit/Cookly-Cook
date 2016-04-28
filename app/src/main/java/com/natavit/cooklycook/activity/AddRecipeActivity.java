@@ -42,9 +42,6 @@ import java.util.Date;
 
 import mehdi.sakout.fancybuttons.FancyButton;
 
-/**
- * Working with Camera: http://developer.android.com/training/camera/photobasics.html
- */
 public class AddRecipeActivity extends AppCompatActivity implements View.OnClickListener {
 
     /**
@@ -151,78 +148,6 @@ public class AddRecipeActivity extends AppCompatActivity implements View.OnClick
         dialog = builder.create();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case IMAGE_FROM_CAMERA: {
-                if (resultCode == RESULT_OK) {
-                    handleBigCameraPhoto();
-
-                    btnAddImgRecipe.setVisibility(View.INVISIBLE);
-                }
-                else {
-                    new File(mCurrentPhotoPath).delete();
-                }
-                break;
-            }
-            case IMAGE_FROM_GALLERY: {
-                if (resultCode == RESULT_OK) {
-                    handleGalleryPhoto(data);
-                }
-            }
-        }
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_save_recipe, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home: {
-                finish();
-                return true;
-            }
-            case R.id.action_save: {
-                if(saveRecipe()) {
-                    setResult(RESULT_OK);
-                    finish();
-                }
-                else {
-                    Toast.makeText(this, "Food name cannot be blank", Toast.LENGTH_SHORT).show();
-                }
-            }
-            default:
-                return false;
-        }
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.ivAddIngredient: {
-                IngredientViewGroup ingredientViewGroup = new IngredientViewGroup(AddRecipeActivity.this);
-                ingredientViewGroup.setLayoutParams(
-                        new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                linearLayoutIngredient.addView(ingredientViewGroup);
-                break;
-            }
-            case R.id.ivImgRecipe: {
-                dialog.show();
-                break;
-            }
-            case R.id.btnAddImgRecipe: {
-                dialog.show();
-                break;
-            }
-        }
-    }
-
     /**
      * Save a new recipe to the local database (SQLite)
      * @return boolean to show whether it succeeds or not
@@ -263,11 +188,20 @@ public class AddRecipeActivity extends AppCompatActivity implements View.OnClick
                 if (ing != null) {
                     String ingredientName = ing.getIngredientName();
                     String ingredientAmount = ing.getIngredientAmount();
+                    String ingredientUnit = ing.getIngredientUnit();
+                    Log.e("ING", ingredientUnit);
                     if (!ingredientName.equals("") && !ingredientName.equals(" ")
-                            && !ingredientAmount.equals("") && !ingredientAmount.equals(" ")) {
+                            && !ingredientAmount.equals("") && !ingredientAmount.equals(" ")
+                            && !ingredientUnit.equals("") && !ingredientUnit.equals(" ")) {
                         db.execSQL("INSERT INTO " + DBCooklyCook.TABLE_INGREDIENT + " ("
-                                + DBCooklyCook.COL_ING_NAME + ", " + DBCooklyCook.COL_ING_AMOUNT + ", " + DBCooklyCook.COL_ING_FOREIGN + ")"
-                                + " VALUES ('" + ingredientName + "', '" + ingredientAmount + "', '" + recipeName + "');");
+                                + DBCooklyCook.COL_ING_NAME + ", "
+                                + DBCooklyCook.COL_ING_AMOUNT + ", "
+                                + DBCooklyCook.COL_ING_UNIT + ", "
+                                + DBCooklyCook.COL_ING_FOREIGN + ")"
+                                + " VALUES ('" + ingredientName + "', '"
+                                + ingredientAmount + "', '"
+                                + ingredientUnit + "', '"
+                                + recipeName + "');");
                     }
                 }
             }
@@ -288,6 +222,8 @@ public class AddRecipeActivity extends AppCompatActivity implements View.OnClick
      *
      * Image Management
      * Capture/Load
+     *
+     * Working with Camera: http://developer.android.com/training/camera/photobasics.html
      *
      */
 
@@ -413,6 +349,78 @@ public class AddRecipeActivity extends AppCompatActivity implements View.OnClick
 
         btnAddImgRecipe.setVisibility(View.INVISIBLE);
 //        mCurrentPhotoPath = null;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case IMAGE_FROM_CAMERA: {
+                if (resultCode == RESULT_OK) {
+                    handleBigCameraPhoto();
+
+                    btnAddImgRecipe.setVisibility(View.INVISIBLE);
+                }
+                else {
+                    new File(mCurrentPhotoPath).delete();
+                }
+                break;
+            }
+            case IMAGE_FROM_GALLERY: {
+                if (resultCode == RESULT_OK) {
+                    handleGalleryPhoto(data);
+                }
+            }
+        }
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_save_recipe, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home: {
+                finish();
+                return true;
+            }
+            case R.id.action_save: {
+                if(saveRecipe()) {
+                    setResult(RESULT_OK);
+                    finish();
+                }
+                else {
+                    Toast.makeText(this, "Food name cannot be blank", Toast.LENGTH_SHORT).show();
+                }
+            }
+            default:
+                return false;
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.ivAddIngredient: {
+                IngredientViewGroup ingredientViewGroup = new IngredientViewGroup(AddRecipeActivity.this);
+                ingredientViewGroup.setLayoutParams(
+                        new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                linearLayoutIngredient.addView(ingredientViewGroup);
+                break;
+            }
+            case R.id.ivImgRecipe: {
+                dialog.show();
+                break;
+            }
+            case R.id.btnAddImgRecipe: {
+                dialog.show();
+                break;
+            }
+        }
     }
 
 }

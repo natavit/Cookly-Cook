@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/CooklyCook.iml" filepath="$PROJECT_DIR$/CooklyCook.iml" />
-      <module fileurl="file://$PROJECT_DIR$/TemplateLibrary/TemplateLibrary.iml" filepath="$PROJECT_DIR$/TemplateLibrary/TemplateLibrary.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

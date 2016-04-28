@@ -22,6 +22,7 @@ public class DBCooklyCook extends SQLiteOpenHelper {
     public static final String COL_ING_ID = "id";
     public static final String COL_ING_NAME = "name";
     public static final String COL_ING_AMOUNT = "amount";
+    public static final String COL_ING_UNIT = "unit";
     public static final String COL_ING_FOREIGN = "fr";
 
     private static final String CREATE_RECIPE_TABLE = "CREATE TABLE " + TABLE_RECIPE + " ("
@@ -34,6 +35,7 @@ public class DBCooklyCook extends SQLiteOpenHelper {
             + COL_ING_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COL_ING_NAME + " TEXT NOT NULL, "
             + COL_ING_AMOUNT + " TEXT NOT NULL, "
+            + COL_ING_UNIT + " TEXT NOT NULL, "
             + COL_ING_FOREIGN + " TEXT NOT NULL);";
 
     public DBCooklyCook(Context context) {

@@ -5,15 +5,13 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.inthecheesefactory.thecheeselibrary.view.BaseCustomViewGroup;
-import com.inthecheesefactory.thecheeselibrary.view.state.BundleSavedState;
 import com.natavit.cooklycook.R;
+import com.natavit.cooklycook.view.state.BundleSavedState;
 
 
 /**
@@ -119,7 +117,7 @@ public class FoodListItem extends BaseCustomViewGroup {
     }
 
     public void setImageUrl(String url) {
-        Log.e("URL", url);
+//        Log.e("URL", url);
         Glide.with(getContext())
                 .load(url)
                 .placeholder(R.drawable.loading)

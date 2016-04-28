@@ -32,15 +32,15 @@ public class MyRecipeFragment extends Fragment implements View.OnClickListener {
     public static final int REQUEST_ADD_RECIPE_CODE = 1111;
     public static final int REQUEST_MORE_INFO_CODE = 2222;
 
-    CoordinatorLayout coordinatorLayout;
+    private CoordinatorLayout coordinatorLayout;
 
-    ListView listView;
+    private ListView listView;
 
-    MutableInteger lastPositionInteger;
+    private MutableInteger lastPositionInteger;
 
-    FloatingActionButton fab;
+    private FloatingActionButton fab;
 
-    LocalFoodListAdapter listAdapter;
+    private LocalFoodListAdapter listAdapter;
 
     /**
      * Function
