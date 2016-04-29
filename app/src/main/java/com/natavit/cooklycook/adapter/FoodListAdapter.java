@@ -16,7 +16,7 @@ import com.natavit.cooklycook.datatype.MutableInteger;
 import com.natavit.cooklycook.view.FoodListItem;
 
 /**
- * Created by Natavit on 2/11/2016 AD.
+ * This adapter is used to control the online recipes which will be shown up by ListView
  */
 public class FoodListAdapter extends BaseAdapter {
 

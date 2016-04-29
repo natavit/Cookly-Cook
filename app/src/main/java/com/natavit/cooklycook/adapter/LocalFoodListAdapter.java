@@ -14,7 +14,7 @@ import com.natavit.cooklycook.view.FoodListItem;
 import java.util.ArrayList;
 
 /**
- * Created by Natavit on 2/11/2016 AD.
+ * This adapter is used to control the local recipes which will be shown up by ListView
  */
 public class LocalFoodListAdapter extends BaseAdapter {
 

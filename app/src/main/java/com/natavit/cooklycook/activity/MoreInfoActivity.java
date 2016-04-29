@@ -16,7 +16,7 @@ import com.natavit.cooklycook.R;
 import com.natavit.cooklycook.dao.HitDao;
 
 /**
- * Created by Natavit on 2/4/2016 AD.
+ * This activity shows more information of the selected recipe (Online recipe)
  */
 public class MoreInfoActivity extends AppCompatActivity {
 

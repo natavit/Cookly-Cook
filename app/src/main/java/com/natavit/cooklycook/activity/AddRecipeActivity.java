@@ -42,6 +42,10 @@ import java.util.Date;
 
 import mehdi.sakout.fancybuttons.FancyButton;
 
+
+/**
+ * This class is used to add a new recipe stored in the local database (SQLite)
+ */
 public class AddRecipeActivity extends AppCompatActivity implements View.OnClickListener {
 
     /**

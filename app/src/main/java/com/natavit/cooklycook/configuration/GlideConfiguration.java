@@ -8,7 +8,7 @@ import com.bumptech.glide.load.DecodeFormat;
 import com.bumptech.glide.module.GlideModule;
 
 /**
- * Created by Natavit on 2/16/2016 AD.
+ * This class is used to change the glide config which is to change an image decode format
  */
 public class GlideConfiguration implements GlideModule {
     @Override

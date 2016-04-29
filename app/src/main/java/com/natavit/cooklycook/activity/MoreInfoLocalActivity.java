@@ -20,7 +20,7 @@ import com.natavit.cooklycook.model.LocalIngredient;
 import com.natavit.cooklycook.model.LocalRecipe;
 
 /**
- * Created by Natavit on 2/4/2016 AD.
+ * This activity shows an information of the selected recipe (Local recipe)
  */
 public class MoreInfoLocalActivity extends AppCompatActivity implements View.OnClickListener {
 

@@ -8,7 +8,7 @@ import com.natavit.cooklycook.fragment.MainFragment;
 import com.natavit.cooklycook.fragment.MyRecipeFragment;
 
 /**
- * Created by Natavit on 4/8/2016 AD.
+ * This adapter is used to control 2 fragments which are MainFragment and MyRecipeFragment
  */
 public class PagerAdapter extends FragmentStatePagerAdapter {
     int mNumOfTabs;

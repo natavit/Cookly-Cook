@@ -7,7 +7,7 @@ import com.natavit.cooklycook.R;
 import com.natavit.cooklycook.fragment.LoginFragment;
 
 /**
- * Created by Natavit on 2/4/2016 AD.
+ * This class is the first activity which is stick with the login fragment
  */
 public class LoginActivity extends FragmentActivity {
 

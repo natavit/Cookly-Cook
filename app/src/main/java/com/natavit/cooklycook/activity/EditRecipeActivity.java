@@ -43,8 +43,9 @@ import java.util.Date;
 
 import mehdi.sakout.fancybuttons.FancyButton;
 
+
 /**
- * Working with Camera: http://developer.android.com/training/camera/photobasics.html
+ * This class is used to edit the selected recipe loaded from the local database (SQLite)
  */
 public class EditRecipeActivity extends AppCompatActivity implements View.OnClickListener {
 

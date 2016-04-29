@@ -47,7 +47,7 @@ import jp.wasabeef.glide.transformations.CropCircleTransformation;
 import mehdi.sakout.fancybuttons.FancyButton;
 
 /**
- * Created by Natavit on 2/4/2016 AD.
+ * This activity is used to control 2 fragments which are MainFragment and MyRecipeFragment
  */
 public class MainActivity extends AppCompatActivity
         implements MainFragment.MainFragmentListener, View.OnClickListener {
