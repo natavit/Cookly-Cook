@@ -277,7 +277,7 @@ public class MainFragment extends Fragment {
         public static final int MODE_RELOAD = 1;
         public static final int MODE_LOAD_MORE = 2;
 
-        int mode;
+        private int mode;
 
         public FoodListLoadCallback(int mode) {
             this.mode = mode;

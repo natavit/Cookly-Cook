@@ -93,7 +93,6 @@ public class FoodListItem extends BaseCustomViewGroup {
         super.onRestoreInstanceState(ss.getSuperState());
 
         Bundle bundle = ss.getBundle();
-        // Restore Stat//from bundle he//
     }
 
     @Override

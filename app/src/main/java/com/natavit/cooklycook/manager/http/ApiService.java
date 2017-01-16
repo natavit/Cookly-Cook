@@ -11,10 +11,10 @@ import retrofit2.http.Query;
  */
 public interface ApiService {
 
-    @POST("search?app_id=f3c9f4db&app_key=a64b3bb38b5e6ec2cc8e172a6e10b32f&from=0&to=10")
+    @POST("/search")
     Call<FoodCollectionDao> loadFoodList(@Query("q") String q);
 
-    @POST("search?app_id=f3c9f4db&app_key=a64b3bb38b5e6ec2cc8e172a6e10b32f")
+    @POST("/search")
     Call<FoodCollectionDao> loadMoreFoodList(@Query("q") String q, @Query("from") int from, @Query("to") int to);
 
 }

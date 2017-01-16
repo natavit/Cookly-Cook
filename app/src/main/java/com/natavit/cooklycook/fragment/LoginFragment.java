@@ -70,7 +70,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 }
             };
 
-
     /**
      *
      * Variable
@@ -122,7 +121,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
         return rootView;
     }
-
 
     /**
      * Initialize view variables
