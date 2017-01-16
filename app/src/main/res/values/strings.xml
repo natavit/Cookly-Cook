@@ -1,19 +1,60 @@
 <resources>
+
+    <string name="facebook_app_id">FACEBOOK_APP_ID</string>
+    <string name="edamam_app_id">EDAMAM_APP_ID</string>
+    <string name="edamam_app_key">EDAMAM_APP_KEY</string>
+
     <string name="app_name">Cookly Cook</string>
     <string name="open_drawer">Open Menu</string>
     <string name="close_drawer">Close Menu</string>
 
+    <string name="profile_name">Name</string>
+    <string name="profile_email">Email</string>
     <string name="signed_in_fmt">Signed in as: %s</string>
-    <string name="email">Email: %s</string>
-    <string name="gender">Gender: %s</string>
+    <string name="email_in_fmt">Email: %s</string>
+    <string name="gender_in_fmt">Gender: %s</string>
     <string name="log_out">\u00A0\u00A0Log out</string>
     <string name="disconnect">Disconnect</string>
     <string name="signed_out">Signed out</string>
     <string name="loading">Loading...</string>
 
-    <string name="facebook_app_id">161289754252206</string>
 
-    <string name="sign_in_with_facebook">\u00A0\u00A0Sign In with Facebook</string>
-    <string name="sign_in_with_google">\u00A0\u00A0Sign In with Google</string>
-    <string name="sign_in_as_guest"><u>Sign In as Guest</u></string>
+    <string name="login_with_facebook">\u00A0\u00A0Login with Facebook</string>
+    <string name="login_with_google">\u00A0\u00A0Login with Google</string>
+
+
+    <string name="title_activity_more_info">MoreInfoActivity</string>
+    <string name="title_activity_more_info_local">MoreInfoLocalActivity</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_add_recipe">Add Recipe</string>
+    <string name="title_activity_edit_recipe">Edit Recipe</string>
+
+    <string name="action_settings">Settings</string>
+
+    <string name="pref_food_key">food_name</string>
+    <string name="pref_food_default">Hamburger</string>
+    <string name="pref_food_label">Food name</string>
+
+    <string name="pref_about_label">About</string>
+
+    <string name="pref_header_general">General</string>
+    <string name="hint_food_name">Food name</string>
+    <string name="hint_ing_name">Ingredient name</string>
+    <string name="hint_ing_amount">Amount</string>
+    <string name="album_name">CooklyCook</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_save">Save</string>
+
+    <string-array name="unit">
+        <item>gram</item>
+        <item>kilogram</item>
+        <item>pound</item>
+        <item>ounce</item>
+        <item>milliliter</item>
+        <item>liter</item>
+        <item>cup</item>
+        <item>tablespoon</item>
+        <item>teaspoon</item>
+    </string-array>
+
 </resources>

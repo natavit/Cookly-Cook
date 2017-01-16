@@ -23,7 +23,10 @@ public class Utils {
         return instance;
     }
 
+    private Context mContext;
+
     private Utils() {
+        mContext = Contextor.getInstance().getContext();
     }
 
     // Check if the network is available or not

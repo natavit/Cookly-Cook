@@ -8,7 +8,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.LinearLayout;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -38,6 +40,42 @@ import mehdi.sakout.fancybuttons.FancyButton;
  */
 public class LoginFragment extends Fragment implements View.OnClickListener {
 
+    /**
+     *
+     * Interface
+     *
+     */
+
+    private FacebookCallback fbCallback =
+            new FacebookCallback<LoginResult>() {
+                @Override
+                public void onSuccess(LoginResult loginResult) {
+                    // App code
+                    updateFacebookToken(loginResult.getAccessToken());
+                }
+
+                @Override
+                public void onCancel() {
+                    // App code
+                    Utils.getInstance().showSnackBarShort("Login Cancel", coordinatorLayout);
+                }
+
+                @Override
+                public void onError(FacebookException exception) {
+                    // App code
+                    if (Utils.getInstance().isOnline())
+                        Utils.getInstance().showSnackBarShort("Login Error", coordinatorLayout);
+                    else
+                        Utils.getInstance().showSnackBarShort("No Internet Connection", coordinatorLayout);
+                }
+            };
+
+    /**
+     *
+     * Variable
+     *
+     */
+
     private static final String TAG = LoginFragment.class.getName();
 
     // Facebook variable
@@ -50,9 +88,16 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     // View
     private CoordinatorLayout coordinatorLayout;
+    private LinearLayout linearLayoutLoginBtn;
+
     private FancyButton btnLoginFacebook;
     private FancyButton btnLoginGoogle;
-    private TextView btnLoginGuest;
+
+    /**
+     *
+     * Function
+     *
+     */
 
     public LoginFragment() {
         super();
@@ -71,22 +116,24 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         View rootView = inflater.inflate(R.layout.fragment_login, container, false);
 
         initInstances(rootView);
-
-        if (!Utils.getInstance().isOnline())
-            Utils.getInstance().showSnackBarLong("Offline Mode", coordinatorLayout);
-
-        initGuestInstances(rootView);
         initFacebookInstances(rootView);
         initGoogleInstances(rootView);
 
         return rootView;
     }
 
+    /**
+     * Initialize view variables
+     */
     private void initInstances(View rootView) {
         coordinatorLayout = (CoordinatorLayout) rootView.findViewById(R.id.coordinatorLayout);
+
+        linearLayoutLoginBtn = (LinearLayout) rootView.findViewById(R.id.linearLayoutLoginBtn);
+        Animation anim = AnimationUtils.loadAnimation(getActivity(), R.anim.up_from_bottom);
+        linearLayoutLoginBtn.startAnimation(anim);
     }
 
-    // Init Facebook //
+    // Init Facebook
     // Login type = 1
     private void initFacebookInstances(View rootView) {
         // init instance with rootView.findViewById here
@@ -94,29 +141,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
         callbackManager = CallbackManager.Factory.create();
 
-        LoginManager.getInstance().registerCallback(callbackManager,
-                new FacebookCallback<LoginResult>() {
-                    @Override
-                    public void onSuccess(LoginResult loginResult) {
-                        // App code
-                        updateFacebookToken(loginResult.getAccessToken());
-                    }
-
-                    @Override
-                    public void onCancel() {
-                        // App code
-                        Utils.getInstance().showSnackBarShort("Login Cancel", coordinatorLayout);
-                    }
-
-                    @Override
-                    public void onError(FacebookException exception) {
-                        // App code
-                        if (Utils.getInstance().isOnline())
-                            Utils.getInstance().showSnackBarShort("Login Error", coordinatorLayout);
-                        else
-                            Utils.getInstance().showSnackBarShort("No Internet Connection", coordinatorLayout);
-                    }
-                });
+        LoginManager.getInstance().
+                registerCallback(callbackManager, fbCallback);
 
         btnLoginFacebook = (FancyButton) rootView.findViewById(R.id.btnLoginFacebook);
         btnLoginFacebook.setOnClickListener(this);
@@ -129,10 +155,15 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         );
     }
 
+    /**
+     * Check Facebook Login Status
+     * If a user already logged in, then go to another activity directly
+     * @param newAccessToken a Token used to check login status
+     */
     private void updateFacebookToken(AccessToken newAccessToken) {
         if (newAccessToken != null) {
             Intent i = new Intent(getActivity(), MainActivity.class);
-            i.putExtra("loginType", R.integer.login_type_facebook);
+            i.putExtra("loginType", getResources().getInteger(R.integer.login_type_facebook));
             startActivity(i);
             getActivity().finish();
         } else {
@@ -154,7 +185,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 .enableAutoManage(getActivity(), new GoogleApiClient.OnConnectionFailedListener() {
                     @Override
                     public void onConnectionFailed(ConnectionResult connectionResult) {
-
+                        Utils.getInstance().showSnackBarLong("Log in failed", coordinatorLayout);
                     }
                 })
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
@@ -169,33 +200,23 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
+    /**
+     * To check Google's Login result
+     * If success, go to another activity
+     * @param result a Result used to check Google's Login result
+     */
     private void handleSignInResult(GoogleSignInResult result) {
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
             Intent i = new Intent(getActivity(), MainActivity.class);
-            i.putExtra("loginType", R.integer.login_type_google);
+            i.putExtra("loginType", getResources().getInteger(R.integer.login_type_google));
             i.putExtra("acct", acct);
             startActivity(i);
             getActivity().finish();
         }
     }
     // End Google //
-
-    // Init Guest //
-    // Login type = 3
-    private void initGuestInstances(View rootView) {
-        btnLoginGuest = (TextView) rootView.findViewById(R.id.btnLoginGuest);
-        btnLoginGuest.setOnClickListener(this);
-    }
-
-    private void logInGuest() {
-        // TODO: Login Guest, check login status by SharedPreference
-        Intent i = new Intent(getActivity(), MainActivity.class);
-        i.putExtra("loginType", R.integer.login_type_guest);
-        startActivity(i);
-        getActivity().finish();
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -261,16 +282,21 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btnLoginFacebook:
-                logInFacebook();
-                break;
-            case R.id.btnLoginGoogle:
-                logInGoogle();
-                break;
-            case R.id.btnLoginGuest:
-                logInGuest();
-                break;
+        if (!Utils.getInstance().isOnline()) {
+            Utils.getInstance().showSnackBarShort("No Internet Connection", coordinatorLayout);
+        }
+        else {
+            switch (v.getId()) {
+                case R.id.btnLoginFacebook: {
+                    logInFacebook();
+                    break;
+                }
+
+                case R.id.btnLoginGoogle:
+                    logInGoogle();
+                    break;
+            }
         }
     }
+
 }

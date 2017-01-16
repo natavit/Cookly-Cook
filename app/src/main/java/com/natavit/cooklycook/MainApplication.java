@@ -26,8 +26,10 @@ public class MainApplication extends Application {
         Contextor.getInstance().init(getApplicationContext());
         FacebookSdk.sdkInitialize(getApplicationContext());
 
-        printKeyHash();
+//        printKeyHash();
     }
+
+
 
     @Override
     public void onTerminate() {

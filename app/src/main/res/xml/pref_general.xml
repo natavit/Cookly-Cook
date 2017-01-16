@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="General">
+
+        <EditTextPreference
+            android:defaultValue="@string/pref_food_default"
+            android:inputType="textCapSentences"
+            android:key="@string/pref_food_key"
+            android:singleLine="true"
+            android:summary="Hamburger"
+            android:title="@string/pref_food_label" />
+
+        <EditTextPreference
+            android:inputType="textCapSentences"
+            android:selectable="false"
+            android:singleLine="true"
+            android:summary="1.0beta"
+            android:title="@string/pref_about_label" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
